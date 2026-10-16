@@ -11,15 +11,15 @@ function OnlineProgramme() {
         loadProgramme();
     }, []);
 
-   const ALLOWED_PROGRAMME_IDS = [79, 74, 72];
-
 const loadProgramme = async () => {
     try {
         const result = await getProgramme(13);
 
+        const ALLOWED_PARENT_IDS = [127, 88];
+
         setData(
             (result || []).filter((item) =>
-                ALLOWED_PROGRAMME_IDS.includes(Number(item.id))
+                ALLOWED_PARENT_IDS.includes(Number(item.parentId))
             )
         );
     } catch (error) {

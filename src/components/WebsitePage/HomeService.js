@@ -23,6 +23,13 @@ export const EnqueryDataSubmit = async (data) => {
     );
     return response.data;
 };
+export const EnqueryDataFranchiseSubmit = async (data) => {
+    const response = await api.post(
+        "https://api.shaheedbhagatsinghhealthandeducation.com/api/Enquiries/franchise-Enquiries",
+        data
+    );
+    return response.data;
+};
 
 export const creatertidata= async (formData) => {
   const data = new FormData();
