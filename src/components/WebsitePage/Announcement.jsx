@@ -51,20 +51,23 @@ function Announcement() {
                                         <React.Fragment
                                             key={`announcement-${item.id ?? index}`}
                                         >
-                                            {item.url_link ? (
-                                                <a
-                                                    href={item.url_link}
-                                                    className="announcement-item"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    {item.name}
-                                                </a>
-                                            ) : (
-                                                <span className="announcement-item">
-                                                    {item.name}
-                                                </span>
-                                            )}
+                                             {item.url_link ? (
+  <a
+    href={item.url_link}
+    className="announcement-item"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    {item.name}
+  </a>
+) : (
+  <a
+    href="/announcements"
+    className="announcement-item"
+  >
+    {item.name}
+  </a>
+)}
 
                                             {index < announcements.length - 1 && (
                                                 <span className="announcement-separator">

@@ -1,7 +1,7 @@
  import React, { useEffect, useState } from "react";
 import { getWebsiteContent } from "./HomeService";
 
-function Placement() {
+function AnnouncementPage() {
     const [contents, setContents] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -233,9 +233,10 @@ function Placement() {
                                             stripHtml(description);
 
                                         const dateVal =
+                                        content.date ||
                                             content.created_at ||
                                             content.createdAt ||
-                                            content.date ||
+                                            
                                             content.entry_date;
 
                                         return (
@@ -1056,4 +1057,4 @@ function Placement() {
     );
 }
 
-export default Placement;
+export default AnnouncementPage;

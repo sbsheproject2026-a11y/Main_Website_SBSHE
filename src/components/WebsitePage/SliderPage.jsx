@@ -332,8 +332,8 @@ function SliderPage() {
 
                 .hero-slider-box .carousel-indicators li.active {
                     background: #ff6600;
-                    width: 28px;
-                    border-radius: 20px;
+                    width: 10px;
+                    border-radius: 50px;
                 }
 
                 /* =========================================================
@@ -589,7 +589,7 @@ function SliderPage() {
                     }
 
                     .hero-slider-box .carousel-indicators li.active {
-                        width: 22px;
+                        width: 10px;
                     }
                 }
 

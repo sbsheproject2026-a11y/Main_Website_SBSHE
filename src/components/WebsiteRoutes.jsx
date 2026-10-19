@@ -12,7 +12,7 @@ import News from "./WebsitePage/News";
  
 import Result from "./WebsitePage/Result";
  
-import Placement from "./WebsitePage/Placement";
+ 
 import Programme from "./WebsitePage/Programme";
 import Gallery from "./WebsitePage/Gallery";
 import StudyCentres from "./WebsitePage/StudyCentres";
@@ -25,6 +25,7 @@ import Activities from "./WebsitePage/Activities";
 import DepartmentRouter from "./WebsitePage/DepartmentRouter";
 import OnlineProgramme from "./WebsitePage/OnlineProgramme";
 import OnlineCourseDeails from "./WebsitePage/OnlineCourseDeails";
+import AnnouncementPage from "./WebsitePage/AnnouncementPage";
  
  
 
@@ -56,7 +57,7 @@ function WebsiteRoutes() {
           <Route path="activities" element={<Activities />} />
           <Route path="authority-letterPrint-print/:id" element={<AuthorityLetterPrint />} />
        
-          <Route path="announcements" element={<Placement/>} />
+          <Route path="announcements" element={<AnnouncementPage/>} />
           <Route path="approvals-achievements" element={<ApprovalsAchievements/>} />
           <Route path="result" element={<Result />} />
           <Route path="gallery" element={<Gallery />} />
