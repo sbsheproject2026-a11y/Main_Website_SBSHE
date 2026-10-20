@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { getWebsiteContent } from "./HomeService";
+import { getWebsiteContent, getWebsiteContentdata } from "./HomeService";
 
 
 
@@ -18,12 +18,12 @@ function Announcement() {
 
             ] = await Promise.all([
 
-                getWebsiteContent(2),
+                getWebsiteContentdata(131),
 
             ]);
 
 
-            setAnnouncements((announcementsData || []).filter(item => item.is_active === true));
+            setAnnouncements((announcementsData || []).filter(item => item.isActive === 1));
 
         } catch (error) {
             console.log("Page data error:", error);
@@ -32,7 +32,7 @@ function Announcement() {
     return (
 
         <>
-       
+
 
             {announcements.length > 0 && (
                 <div className="announcement-wrapper">
@@ -51,23 +51,23 @@ function Announcement() {
                                         <React.Fragment
                                             key={`announcement-${item.id ?? index}`}
                                         >
-                                             {item.url_link ? (
-  <a
-    href={item.url_link}
-    className="announcement-item"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    {item.name}
-  </a>
-) : (
-  <a
-    href="/announcements"
-    className="announcement-item"
-  >
-    {item.name}
-  </a>
-)}
+                                            {item.url_link ? (
+                                                <a
+                                                    href={item.url_link}
+                                                    className="announcement-item"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {item.name}
+                                                </a>
+                                            ) : (
+                                                <a
+                                                    href="/announcements"
+                                                    className="announcement-item"
+                                                >
+                                                    {item.name}
+                                                </a>
+                                            )}
 
                                             {index < announcements.length - 1 && (
                                                 <span className="announcement-separator">
@@ -341,7 +341,7 @@ function Announcement() {
                     </style>
                 </div>
             )}
-        
+
         </>
     )
 }

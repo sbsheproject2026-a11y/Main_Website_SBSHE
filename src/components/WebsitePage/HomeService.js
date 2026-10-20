@@ -1,4 +1,4 @@
-import api from "../api";
+import api, { api2 } from "../api";
 
 export const getWebsiteContent = async (menuId) => {
     const response = await api.get(
@@ -7,12 +7,19 @@ export const getWebsiteContent = async (menuId) => {
 
     return response.data.results;
 };
-export const getWebsiteContentdata = async (slug) => {
+export const getWebsiteContentdata1 = async (slug) => {
     const response = await api.get(
         `/website-content/?menu_slug=${slug}`
     );
 
     return response.data.results;
+};
+export const getWebsiteContentdata = async (id) => {
+    const response = await api2.get(
+       `/Website/all-website-content/${id}`
+    );
+
+    return response.data;
 };
 
 

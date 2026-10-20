@@ -1,5 +1,6 @@
- import React, { useEffect, useState } from "react";
-import { getWebsiteContent } from "./HomeService";
+import React, { useEffect, useState } from "react";
+import { getWebsiteContent, getWebsiteContentdata } from "./HomeService";
+import { FILE_URL } from "../api";
 
 function ApprovalsAchievements() {
     const [search, setSearch] = useState("");
@@ -16,9 +17,10 @@ function ApprovalsAchievements() {
 
     const loadPlacementData = async () => {
         try {
-            const placementData = await getWebsiteContent(32);
+            const placementData = await getWebsiteContentdata(129);
+
             setPlacements(
-                (placementData || []).filter(item => item.is_active === true)
+                (placementData || []).filter(item => item.isActive === 1)
             );
             setCurrentPage(1);
         } catch (error) {
@@ -31,8 +33,10 @@ function ApprovalsAchievements() {
         id: item.id,
         title: item.name || "",
         date: item.date ? item.date.split("-").reverse().join("-") : "",
-        description: item.description || "",
-        file: item.file || ""
+        description: item.descrption || "",
+        file: item.productCategoryDocuments?.[0]?.fileupload
+            ? `${FILE_URL}${item.productCategoryDocuments[0].fileupload}`
+            : ""
     }));
 
     const filteredPlacements = placementData.filter(item => {
@@ -131,10 +135,11 @@ function ApprovalsAchievements() {
                         <div className="approvals-records">
                             <span>Show</span>
                             <select value={recordsPerPage} onChange={handleRecordsChange}>
-                                <option value={5}>5</option>
+                   
                                 <option value={10}>10</option>
                                 <option value={25}>25</option>
                                 <option value={50}>50</option>
+                                <option value={100}>100</option>
                             </select>
                             <span>entries</span>
                         </div>
@@ -181,12 +186,7 @@ function ApprovalsAchievements() {
                                                     {String(startIndex + index + 1).padStart(2, "0")}
                                                 </span>
 
-                                                {item.date && (
-                                                    <span className="ac-date">
-                                                        <i className="fa fa-calendar-o"></i>
-                                                        {item.date}
-                                                    </span>
-                                                )}
+                                                 
                                             </div>
 
                                             {/* Title */}

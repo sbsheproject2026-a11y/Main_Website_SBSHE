@@ -1,33 +1,37 @@
- import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { getWebsiteContentdata } from "./HomeService";
 
 function Career() {
     const { slug } = useParams();
-
+    const location = useLocation();
+    const id = location.state?.id;
     const [contents, setContents] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadPageData();
-    }, [slug]);
+        if (id) {
+            loadPageData(id);
+        }
+    }, [id]);
 
     const loadPageData = async () => {
         try {
             setLoading(true);
 
-            if (!slug) {
+            if (!id) {
                 setContents([]);
                 return;
             }
 
-            const result = await getWebsiteContentdata(slug);
+            const result = await getWebsiteContentdata(id);
 
             const data = [...(result || [])]
-                .filter((item) => item.is_active === true)
+                .filter((item) => item.isActive === 1)
                 .sort((a, b) => {
-                    const sa = a.serial_number;
-                    const sb = b.serial_number;
+                    const sa = a.srNo;
+                    const sb = b.srNo;
 
                     const aIsNull = sa === null || sa === undefined;
                     const bIsNull = sb === null || sb === undefined;
@@ -86,8 +90,19 @@ function Career() {
                     </div>
 
                     {contents.map((content, index) => {
-                        const imageUrl = content.file_url || content.file || "";
-                        const hasImage = imageUrl && imageUrl.trim() !== "";
+                        // ✅ 1. Array ke pehle element (index 0) ko access karo
+                        const doc = content.productCategoryDocuments?.[0];
+
+                        // ✅ 2. File ka URL nikaalo (Agar fileupload hai toh wo, warna kuch nahi)
+                        const fileUrl = doc?.fileupload || "";
+
+                        // ✅ 3. Check karo ki file ek IMAGE hai ya PDF
+                        // (Kyunki agar PDF hui aur humne <img> tag me daala, toh image break ho jayegi)
+                        const isImage = fileUrl && /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(fileUrl);
+
+                        // ✅ 4. Agar image hai tabhi layout me image dikhao
+                        const hasImage = isImage;
+                        const imageOnLeft = index % 2 === 0;
 
                         return (
                             <div className="cms-card" key={content.id ?? index}>
@@ -104,7 +119,7 @@ function Career() {
 
                                         {content.short_intro && (
                                             <p className="cms-card-subtitle">
-                                                {content.short_intro}
+                                                {content.shortDescription}
                                             </p>
                                         )}
                                     </div>
@@ -132,7 +147,7 @@ function Career() {
                                                 <div
                                                     className="cms-rich-text"
                                                     dangerouslySetInnerHTML={{
-                                                        __html: content.description || "",
+                                                        __html: content.descrption || "",
                                                     }}
                                                 />
                                             </div>

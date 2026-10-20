@@ -1,65 +1,69 @@
- import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { getWebsiteContentdata } from "./HomeService";
 
 function About() {
-    const { slug } = useParams();
-
+    //const { slug } = useParams();
+    const location = useLocation();
+    const id = location.state?.id;
     const [contents, setContents] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadPageData();
-    }, [slug]);
-
- const loadPageData = async () => {
-    try {
-        setLoading(true);
-
-        if (!slug) {
-            setContents([]);
-            return;
+        if (id) {
+            loadPageData(id);
         }
+    }, [id]);
 
-        const result = await getWebsiteContentdata(slug);
+    const loadPageData = async () => {
+        try {
+            setLoading(true);
 
-        // ✅ Filter + Sort
-        const data = [...(result || [])]
-            .filter((item) => item.is_active === true)
-            .sort((a, b) => {
-                const sa = a.serial_number;
-                const sb = b.serial_number;
+            if (!id) {
+                setContents([]);
+                return;
+            }
 
-                const aIsNull = sa === null || sa === undefined;
-                const bIsNull = sb === null || sb === undefined;
+            const result = await getWebsiteContentdata(id);
 
-                // Dono null → original order
-                if (aIsNull && bIsNull) return 0;
+            // ✅ Filter + Sort
+            const data = [...(result || [])]
+                .filter((item) => item.isActive === 1)
+                .sort((a, b) => {
+                    const sa = a.srNo;
+                    const sb = b.srNo;
 
-                // Sirf a null → a LAST me
-                if (aIsNull) return 1;
+                    const aIsNull = sa === null || sa === undefined;
+                    const bIsNull = sb === null || sb === undefined;
 
-                // Sirf b null → b LAST me
-                if (bIsNull) return -1;
+                    // Dono null → original order
+                    if (aIsNull && bIsNull) return 0;
 
-                // Dono ke paas value → ascending (1, 2, 3...)
-                return Number(sa) - Number(sb);
-            });
+                    // Sirf a null → a LAST me
+                    if (aIsNull) return 1;
 
-        console.log("SORTED DATA:", data.map((x) => ({
-            id: x.id,
-            name: x.name,
-            serial: x.serial_number,
-        })));
+                    // Sirf b null → b LAST me
+                    if (bIsNull) return -1;
 
-        setContents(data);
-    } catch (error) {
-        console.log("Page data error:", error);
-        setContents([]);
-    } finally {
-        setLoading(false);
-    }
-};
+                    // Dono ke paas value → ascending (1, 2, 3...)
+                    return Number(sa) - Number(sb);
+                });
+
+            console.log("SORTED DATA:", data.map((x) => ({
+                id: x.id,
+                name: x.name,
+                serial: x.srNo,
+            })));
+
+            setContents(data);
+        } catch (error) {
+            console.log("Page data error:", error);
+            setContents([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -91,37 +95,37 @@ function About() {
                 <div className="container">
 
                     {contents.map((content, index) => {
-                        // ✅ Image URL nikalo
-                        const imageUrl = content.file_url || content.file || "";
+                        // ✅ 1. Array ke pehle element (index 0) ko access karo
+                        const doc = content.productCategoryDocuments?.[0];
 
-                        // ✅ Image hai ya nahi
-                        const hasImage = imageUrl && imageUrl.trim() !== "";
+                        // ✅ 2. File ka URL nikaalo (Agar fileupload hai toh wo, warna kuch nahi)
+                        const fileUrl = doc?.fileupload || "";
 
-                        // ✅ Alternate layout (sirf tab matter karta hai jab image ho)
+                        // ✅ 3. Check karo ki file ek IMAGE hai ya PDF
+                        // (Kyunki agar PDF hui aur humne <img> tag me daala, toh image break ho jayegi)
+                        const isImage = fileUrl && /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(fileUrl);
+
+                        // ✅ 4. Agar image hai tabhi layout me image dikhao
+                        const hasImage = isImage;
                         const imageOnLeft = index % 2 === 0;
 
                         return (
-                            <div
-                                className="about-card"
-                                key={content.id ?? index}
-                            >
+                            <div className="about-card" key={content.id ?? index}>
                                 <div className="row align-items-center g-0">
 
-                                    {/* ✅ IMAGE LEFT — jab image ho aur even index */}
+                                    {/* ✅ IMAGE LEFT */}
                                     {hasImage && imageOnLeft && (
                                         <div className="col-lg-5">
                                             <div className="about-visual">
                                                 <div className="about-image-box">
                                                     <div className="image-glow"></div>
-
                                                     <div className="image-inner">
                                                         <img
-                                                            src={imageUrl}
-                                                            alt={content.name || "About Us"}
+                                                            src={fileUrl} // ✅ Yahan fileUrl use kiya
+                                                            alt={doc?.altTag || content.name || "About Us"} // ✅ Alt tag DB se
                                                             className="about-main-image"
                                                         />
                                                     </div>
-
                                                     <div className="image-corner corner-top"></div>
                                                     <div className="image-corner corner-bottom"></div>
                                                 </div>
@@ -129,55 +133,51 @@ function About() {
                                         </div>
                                     )}
 
-                                    {/* ✅ CONTENT — image ho to 7, warna 12 */}
+                                    {/* CONTENT */}
                                     <div className={hasImage ? "col-lg-7" : "col-lg-12"}>
                                         <div className="about-content">
-
                                             <h1 className="about-title">
-                                                {content.short_name}   {content.name}
+                                                {content.shortDescription} {content.name}
                                             </h1>
-
                                             <div className="title-line">
                                                 <span></span>
                                                 <span></span>
                                                 <span></span>
                                             </div>
 
-                                            {content.short_intro && (
+                                            {/* ✅ Yahan aapne 'short_intro' check kiya tha jo JSON me nahi hai. 
+                            JSON me 'shortDescription' hai */}
+                                            {content.shortDescription && (
                                                 <div className="about-short-intro">
-                                                    {content.short_intro}
+                                                    {content.shortDescription}
                                                 </div>
                                             )}
 
                                             <div
                                                 className="about-description"
                                                 dangerouslySetInnerHTML={{
-                                                    __html: content.description || ""
+                                                    __html: content.descrption || ""
                                                 }}
                                             />
-
                                             <div className="about-bottom-line">
                                                 <span></span>
                                             </div>
-
                                         </div>
                                     </div>
 
-                                    {/* ✅ IMAGE RIGHT — jab image ho aur odd index */}
+                                    {/* ✅ IMAGE RIGHT */}
                                     {hasImage && !imageOnLeft && (
                                         <div className="col-lg-5">
                                             <div className="about-visual">
                                                 <div className="about-image-box">
                                                     <div className="image-glow"></div>
-
                                                     <div className="image-inner">
                                                         <img
-                                                            src={imageUrl}
-                                                            alt={content.name || "About Us"}
+                                                            src={fileUrl} // ✅ Yahan fileUrl use kiya
+                                                            alt={doc?.altTag || content.name || "About Us"}
                                                             className="about-main-image"
                                                         />
                                                     </div>
-
                                                     <div className="image-corner corner-top"></div>
                                                     <div className="image-corner corner-bottom"></div>
                                                 </div>

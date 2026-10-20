@@ -1,5 +1,6 @@
  import React, { useEffect, useState } from "react";
-import { getWebsiteContent } from "./HomeService";
+import { getWebsiteContent, getWebsiteContentdata } from "./HomeService";
+import { FILE_URL } from "../api";
 
 function AnnouncementPage() {
     const [contents, setContents] = useState([]);
@@ -37,13 +38,13 @@ function AnnouncementPage() {
         try {
             setLoading(true);
 
-            const result = await getWebsiteContent(2);
+            const result = await getWebsiteContentdata(131);
 
             const data = [...(result || [])]
-                .filter((item) => item.is_active === true)
+                .filter((item) => item.isActive === 1)
                 .sort((a, b) => {
-                    const sa = a.serial_number;
-                    const sb = b.serial_number;
+                    const sa = a.srNo;
+                    const sb = b.srNo;
 
                     const aIsNull = sa === null || sa === undefined;
                     const bIsNull = sb === null || sb === undefined;
@@ -92,7 +93,9 @@ function AnnouncementPage() {
 
     // ✅ File URL nikaalo
     const getFileUrl = (content) => {
-        return content.file_url || content.file || "";
+        return  content.productCategoryDocuments?.[0]?.fileupload 
+            ? `${FILE_URL}${content.productCategoryDocuments[0].fileupload}` 
+            : "";
     };
 
     const hasFile = (content) => {
@@ -225,8 +228,8 @@ function AnnouncementPage() {
                                         const fileExists = hasFile(content);
 
                                         const description =
-                                            content.description ||
-                                            content.short_intro ||
+                                            content.descrption ||
+                                            content.shortDescription ||
                                             "";
 
                                         const plainText =
@@ -276,7 +279,7 @@ function AnnouncementPage() {
                                                         {content.short_name && (
                                                             <span className="plc-name-short">
                                                                 {
-                                                                    content.short_name
+                                                                    content.shortDescription
                                                                 }
                                                             </span>
                                                         )}

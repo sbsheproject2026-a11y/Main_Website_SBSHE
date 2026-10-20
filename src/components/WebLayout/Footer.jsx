@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getWebsiteContent } from '../WebsitePage/HomeService';
+import {   getWebsiteContentdata } from '../WebsitePage/HomeService';
 
 function Footer() {
     const [contacts, setContacts] = useState([]);
@@ -13,13 +13,12 @@ function Footer() {
         try {
             const [contactsData] =
                 await Promise.all([
-                    getWebsiteContent(18),
+                    getWebsiteContentdata(134),
 
                 ]);
 
             setContacts(contactsData.filter(
-                (item) => item.is_active === true
-            ));
+                (item) => item.isActive === 1));
 
 
         } catch (error) {
@@ -39,7 +38,7 @@ function Footer() {
                                 <h5 className="text-primary text-uppercase mb-4" style={{ letterSpacing: "5px" }}>Get In Touch</h5>
                                 <div style={{ fontSize: "15px" }}
                                     dangerouslySetInnerHTML={{
-                                        __html: contacts?.[0]?.description || ""
+                                        __html: contacts?.[0]?.descrption || ""
                                     }}
                                 />
 
@@ -75,7 +74,7 @@ function Footer() {
                             <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com/study-centre-apply"><i className="fa fa-angle-right mr-2"></i>Study Center Registration</Link>
                             <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com"><i className="fa fa-angle-right mr-2"></i>Study Centres Login</Link>
 
-                            <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com/student-apply"><i className="fa fa-angle-right mr-2"></i>Student Registration</Link>
+                            <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com/new-student-apply"><i className="fa fa-angle-right mr-2"></i>Student Registration</Link>
                             <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com"><i className="fa fa-angle-right mr-2"></i>Student Login</Link>
 
                         </div>

@@ -23,7 +23,7 @@ const { slug } = useParams();
   "/course-details": "Course Details",
   "/online-course-details": "Online Course Details",
   "/study-centres": "Study Centres",
-  "/approvals-achievements": <>...</>,
+  "/approvals-achievements": <>Approvals <br/>Achievements</>,
   "/admission-consultant-partner": "Admission Consultant Registration",
 };
 

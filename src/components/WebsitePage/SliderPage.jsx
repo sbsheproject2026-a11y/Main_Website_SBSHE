@@ -1,5 +1,6 @@
  import React, { useEffect, useState } from "react";
-import { getWebsiteContent, EnqueryDataSubmit, EnqueryDataFranchiseSubmit } from "./HomeService";
+import { getWebsiteContent, EnqueryDataSubmit, EnqueryDataFranchiseSubmit, getWebsiteContentdata } from "./HomeService";
+import { FILE_URL } from "../api";
 
 function SliderPage() {
     const [activeSlide, setActiveSlide] = useState(0);
@@ -21,18 +22,18 @@ function SliderPage() {
 
     const loadPageData = async () => {
         try {
-            const [slidersData] = await Promise.all([getWebsiteContent(1)]);
+            const [slidersData] = await Promise.all([getWebsiteContentdata(119)]);
             setSliders(
-                (slidersData || []).filter((item) => item.is_active === true)
+                (slidersData || []).filter((item) => item.isActive === 1)
             );
         } catch (error) {
             console.log("Page data error:", error);
         }
     };
 
-    const slides = sliders
-        .filter((item) => item.is_active && item.file)
-        .map((item) => item.file);
+const slides = sliders.flatMap((item) => 
+    item.productCategoryDocuments?.map((doc) => FILE_URL + doc.fileupload) || []
+);
 
     useEffect(() => {
         setActiveSlide(0);

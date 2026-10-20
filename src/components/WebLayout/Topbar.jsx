@@ -193,7 +193,7 @@ function TopBar({
 
                                 </div>
                                 <Link
-                                    to="https://soft.shaheedbhagatsinghhealthandeducation.com/student-apply"
+                                    to="https://soft.shaheedbhagatsinghhealthandeducation.com/new-student-apply"
                                     className="admission-open-badge"
                                     aria-label="Admission Open 15 Oct 2026"
                                     title="Admission Open 15 Oct 2026"

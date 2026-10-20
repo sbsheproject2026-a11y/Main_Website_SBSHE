@@ -241,7 +241,7 @@ function CourseDeails() {
                                         <th>Course Name</th>
                                         <th>Duration</th>
                                         <th>Eligbilty</th>
-                                        <th>Course Fee</th>
+                                        {/* <th>Course Fee</th> */}
                                     </tr>
                                 </thead>
 

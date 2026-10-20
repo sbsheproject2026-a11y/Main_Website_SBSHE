@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getWebsiteContent } from "../WebsitePage/HomeService";
+import { getWebsiteContent, getWebsiteContentdata } from "../WebsitePage/HomeService";
 import { getMenu } from "./HeaderService";
 
 function Header() {
@@ -24,11 +24,11 @@ function Header() {
 
     const loadPageData = async () => {
         try {
-            const notesData = await getWebsiteContent(21);
+            const notesData = await getWebsiteContentdata(132);
 
             setNotes(
                 (notesData || []).filter(
-                    (item) => item.is_active === true
+                    (item) => item.isActive === 1
                 )
             );
         } catch (error) {
@@ -44,8 +44,8 @@ function Header() {
     const loadMenu = async () => {
         try {
             const [aboutData, campusData] = await Promise.all([
-                getMenu(10),
-                getMenu(27),
+                getMenu(0,128),
+                getMenu(0,130),
             ]);
 
             // ✅ Serial number sort:
@@ -53,10 +53,10 @@ function Header() {
             // - Jo items me serial_number null hai → baad me (original API order)
             const sortBySerial = (list) => {
                 return [...(list || [])]
-                    .filter((item) => item.is_active === true)
+                    .filter((item) => item.isActive === 1)
                     .sort((a, b) => {
-                        const sa = a.serial_number;
-                        const sb = b.serial_number;
+                        const sa = a.srNo;
+                        const sb = b.srNo;
 
                         const aIsNull = sa === null || sa === undefined;
                         const bIsNull = sb === null || sb === undefined;
@@ -231,6 +231,7 @@ function Header() {
                                             <Link
                                                 key={item.id}
                                                 to={`/about/${item.slug}`}
+                                                 state={{ id: item.id }}
                                                 className="main-dropdown-item"
                                                 onClick={closeMobileMenu}
                                             >
@@ -336,6 +337,7 @@ function Header() {
                                             <Link
                                                 key={item.id}
                                                 to={`/department/${item.slug}`}
+                                                     state={{ id: item.id }}
                                                 className="main-dropdown-item"
                                                 onClick={closeMobileMenu}
                                             >
@@ -501,6 +503,7 @@ function Header() {
                                         <Link
                                             key={item.id}
                                             to={`/about/${item.slug}`}
+                                                 state={{ id: item.id }}
                                             className="mobile-submenu-item"
                                             onClick={closeMobileMenu}
                                         >
@@ -622,6 +625,7 @@ function Header() {
                                         <Link
                                             key={item.id}
                                             to={`/department/${item.slug}`}
+                                                 state={{ id: item.id }}
                                             className="mobile-submenu-item"
                                             onClick={closeMobileMenu}
                                         >
@@ -754,7 +758,7 @@ function Header() {
 
                                     <div className="common-notice-item">
                                         {cleanDescription(
-                                            item.description
+                                            item.descrption
                                         )}
                                     </div>
 

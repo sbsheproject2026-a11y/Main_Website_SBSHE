@@ -55,12 +55,19 @@ function OnlineCourseDeails() {
     };
 
     // ✅ Apply Now — studyModeId URL mein bhejo
+//   const handleApplyNow = (studyModeId, courseId) => {
+//     if (!studyModeId) {
+//         window.location.href = APPLY_URL;
+//         return;
+//     }
+//     window.location.href = `${APPLY_URL}?studyModeId=${studyModeId}&Courseid=${courseId}`;
+// };
   const handleApplyNow = (studyModeId, courseId) => {
     if (!studyModeId) {
         window.location.href = APPLY_URL;
         return;
     }
-    window.location.href = `${APPLY_URL}?studyModeId=${studyModeId}&Courseid=${courseId}`;
+    window.location.href = `${APPLY_URL}`;
 };
 
     const filteredCourses = data.filter((course) => {

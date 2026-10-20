@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getWebsiteContent } from './HomeService';
+import { getWebsiteContent, getWebsiteContentdata } from './HomeService';
 
 function Contact() {
 
@@ -13,13 +13,12 @@ function Contact() {
         try {
             const [contactsData] =
                 await Promise.all([
-                    getWebsiteContent(18),
+                    getWebsiteContentdata(134),
 
                 ]);
 
             setContacts(contactsData.filter(
-        (item) => item.is_active === true
-    ));
+        (item) => item.isActive === 1));
 
 
         } catch (error) {
@@ -242,7 +241,7 @@ function Contact() {
                         <div
                             dangerouslySetInnerHTML={{
                                 __html:
-                                    contacts?.[0]?.description || ""
+                                    contacts?.[0]?.descrption || ""
                             }}
                         />
 

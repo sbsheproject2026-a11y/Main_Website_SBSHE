@@ -1,5 +1,5 @@
  import React, { useEffect, useState } from "react";
-import { getWebsiteContent } from "./HomeService";
+import { getWebsiteContent, getWebsiteContentdata } from "./HomeService";
 import { Link } from "react-router-dom";
 
 function WhyChosseUs() {
@@ -12,15 +12,15 @@ function WhyChosseUs() {
     const loadPageData = async () => {
         try {
             const [data23, data43] = await Promise.all([
-                getWebsiteContent(23),
-                getWebsiteContent(43),
+                getWebsiteContentdata(1145),
+                getWebsiteContentdata(1151),
             ]);
 
             // ✅ Dono ka data merge + filter
             const merged = [
                 ...(data23 || []),
                 ...(data43 || []),
-            ].filter((item) => item.is_active === true);
+            ].filter((item) => item.isActive === 1);
 
             setWhychosseus(merged);
         } catch (error) {
@@ -130,14 +130,26 @@ function WhyChosseUs() {
         <>
             {/* ✅ Har item ka apna section */}
             {whyChosseUs.map((item, index) => {
+// ✅ 1. Array ke pehle element (index 0) ko access karo
+                        const doc = item.productCategoryDocuments?.[0];
 
+                        // ✅ 2. File ka URL nikaalo (Agar fileupload hai toh wo, warna kuch nahi)
+                        const fileUrl = doc?.fileupload || "";
+
+                        // ✅ 3. Check karo ki file ek IMAGE hai ya PDF
+                        // (Kyunki agar PDF hui aur humne <img> tag me daala, toh image break ho jayegi)
+                        const isImage = fileUrl && /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(fileUrl);
+
+                        // ✅ 4. Agar image hai tabhi layout me image dikhao
+                        const hasImage = isImage;
+                       
                 // ✅ Image URL check
-                const imageUrl = item?.file_url || item?.file || "";
-                const hasImage = Boolean(imageUrl && imageUrl.trim() !== "");
+               // const imageUrl = item?.file_url || item?.file || "";
+               // const hasImage = Boolean(imageUrl && imageUrl.trim() !== "");
 
                 // ✅ Description — paragraphs + truncated
                 const { paragraphs, truncated } = getLimitedDescription(
-                    item.description,
+                    item.descrption,
                     100
                 );
 
@@ -211,7 +223,7 @@ function WhyChosseUs() {
                                             <span className="label-line"></span>
 
                                             <span className="label-text">
-                                                {item.menu_name || "WHY CHOOSE US"}
+                                                {item.productType || ""}
                                             </span>
 
                                         </div>
