@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getProgramme } from "./CourseServiceData";
+ 
 import { FILE_URL } from "../api";
+import { getProgramme } from "./HomeService";
 
 function OnlineProgramme() {
     const [data, setData] = useState([]);

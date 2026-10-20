@@ -1,5 +1,5 @@
  import React, { useEffect, useState } from "react";
-import { getWebsiteContent } from "./HomeService";
+import {   getWebsiteContentdata } from "./HomeService";
 
 function Activities() {
     const [placements, setPlacements] = useState([]);
@@ -13,7 +13,7 @@ function Activities() {
 
     const loadPlacementData = async () => {
         try {
-            const placementData = await getWebsiteContent(40);
+            const placementData = await getWebsiteContentdata(40);
 
             setPlacements(
                 (placementData || []).filter(

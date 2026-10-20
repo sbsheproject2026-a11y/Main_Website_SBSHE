@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getWebsiteContent, getWebsiteContentdata } from "../WebsitePage/HomeService";
-import { getMenu } from "./HeaderService";
+import {   getMenu, getWebsiteContentdata } from "../WebsitePage/HomeService";
+ 
 
 function Header() {
     const [notes, setNotes] = useState([]);

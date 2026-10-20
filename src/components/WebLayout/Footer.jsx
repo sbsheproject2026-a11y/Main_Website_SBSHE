@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import {   getWebsiteContentdata } from '../WebsitePage/HomeService';
+import { getWebsiteContentdata } from '../WebsitePage/HomeService';
 
 function Footer() {
     const [contacts, setContacts] = useState([]);

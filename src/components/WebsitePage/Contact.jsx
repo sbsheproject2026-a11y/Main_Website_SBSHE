@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getWebsiteContent, getWebsiteContentdata } from './HomeService';
+import {   getWebsiteContentdata } from './HomeService';
 
 function Contact() {
 

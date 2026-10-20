@@ -1,5 +1,5 @@
  import React, { useEffect, useState } from "react";
-import { getWebsiteContent, EnqueryDataSubmit, EnqueryDataFranchiseSubmit, getWebsiteContentdata } from "./HomeService";
+import {   EnqueryDataFranchiseSubmit, getWebsiteContentdata } from "./HomeService";
 import { FILE_URL } from "../api";
 
 function SliderPage() {

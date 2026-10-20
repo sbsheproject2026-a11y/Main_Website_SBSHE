@@ -1,19 +1,15 @@
-import api, { api2 } from "../api";
 
-export const getWebsiteContent = async (menuId) => {
-    const response = await api.get(
-        `/website-content/?menu=${menuId}`
+import api2 from "../api";
+
+export const getMenu = async (menuId,submenuId) => {
+    const response = await api2.get(
+       // `/website-menu?parent=${menuId}`
+        `/Website/website-menu?id=${menuId}&pid=${submenuId}`
     );
 
-    return response.data.results;
+    return response.data; 
 };
-export const getWebsiteContentdata1 = async (slug) => {
-    const response = await api.get(
-        `/website-content/?menu_slug=${slug}`
-    );
-
-    return response.data.results;
-};
+ 
 export const getWebsiteContentdata = async (id) => {
     const response = await api2.get(
        `/Website/all-website-content/${id}`
@@ -90,3 +86,12 @@ export const getCheckStatus = async (id) => {
 };
 
 
+export const getProgramme  = async (id) => {
+  const response = await api2.get(`/Website/website-content/${id}`);
+  return response.data;
+};
+ 
+export const getCourses = async (id) => {
+    const response = await api2.get(`/Website/website-course/${id}`);
+    return response.data;
+};

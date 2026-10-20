@@ -1,53 +1,87 @@
  import React, { useEffect, useState } from "react";
-import { getWebsiteContent } from "./HomeService";
+import { getWebsiteContentdata } from "./HomeService";
+import { FILE_URL } from "../api";
 
 function Testimonial() {
-    const [testimonial, setTestimonial] = useState([]);
+    const [testimonials, setTestimonials] = useState([]);
     const [activeTestimonial, setActiveTestimonial] = useState(0);
+    const [isJumping, setIsJumping] = useState(false); // ✅ Naya state transition rokne ke liye
 
     useEffect(() => {
         loadPageData();
     }, []);
 
+    // HTML tags hatane ke liye helper function
+    const stripHtml = (html) => {
+        if (!html) return "";
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        return doc.body.textContent || "";
+    };
+
     const loadPageData = async () => {
         try {
-            const testimonialdata = await getWebsiteContent(19);
+            const testimonialdata = await getWebsiteContentdata(133);
+            
+            let flatData = [];
+            
+            (testimonialdata || []).forEach(item => {
+                if (item.isActive === 1 && item.productCategoryDocuments) {
+                    item.productCategoryDocuments.forEach(doc => {
+                        flatData.push({
+                            id: doc.id,
+                            name: doc.name || "Student",
+                            role: item.name || "Student",
+                            review: stripHtml(item.descrption),
+                            image: doc.fileupload ? `${FILE_URL}${doc.fileupload}` : "",
+                        });
+                    });
+                }
+            });
 
-            setTestimonial(
-                (testimonialdata || []).filter(
-                    item => item.is_active === true
-                )
-            );
+            setTestimonials(flatData);
         } catch (error) {
             console.log("Page data error:", error);
-            setTestimonial([]);
+            setTestimonials([]);
         }
     };
 
-    const displayTestimonials = testimonial.slice().reverse();
+    const displayTestimonials = testimonials.slice().reverse();
 
     const sliderTestimonials = [
         ...displayTestimonials,
         ...displayTestimonials
     ];
 
+    // ✅ Auto Slide Logic (Thoda update kiya taaki jump ke time na chale)
     useEffect(() => {
         if (displayTestimonials.length <= 1) return;
 
         const interval = setInterval(() => {
-            setActiveTestimonial(prev => prev + 1);
+            if (!isJumping && activeTestimonial !== displayTestimonials.length) {
+                setActiveTestimonial(prev => prev + 1);
+            }
         }, 5000);
 
         return () => clearInterval(interval);
-    }, [displayTestimonials.length]);
+    }, [displayTestimonials.length, isJumping, activeTestimonial]);
 
+    // ✅ Smooth Reset Logic
     useEffect(() => {
         if (
             displayTestimonials.length > 1 &&
             activeTestimonial === displayTestimonials.length
         ) {
+            // 650ms wait karo (jab tak 3rd slide se clone tak ka animation pura ho)
             const timer = setTimeout(() => {
+                // 1. Transition ko band karo
+                setIsJumping(true);
+                // 2. Wapis 0 par le jao
                 setActiveTestimonial(0);
+                
+                // 3. Thodi der baad transition wapis on kar do
+                setTimeout(() => {
+                    setIsJumping(false);
+                }, 50);
             }, 650);
 
             return () => clearTimeout(timer);
@@ -59,17 +93,32 @@ function Testimonial() {
             ? 0
             : activeTestimonial;
 
+    // ✅ Previous Button Logic Fix
     const handlePrevious = () => {
+        if (isJumping) return;
+
         if (activeTestimonial === 0) {
-            setActiveTestimonial(displayTestimonials.length - 1);
+            // Agar first slide par hain, toh instantly last slide (clone) par jao
+            setIsJumping(true);
+            setActiveTestimonial(displayTestimonials.length);
+            
+            setTimeout(() => {
+                setIsJumping(false);
+                // Fir smoothly original last slide par aao
+                setActiveTestimonial(displayTestimonials.length - 1);
+            }, 50);
         } else {
             setActiveTestimonial(prev => prev - 1);
         }
     };
 
+    // ✅ Next Button Logic Fix
     const handleNext = () => {
+        if (isJumping || activeTestimonial === displayTestimonials.length) return;
         setActiveTestimonial(prev => prev + 1);
     };
+
+    if (!displayTestimonials || displayTestimonials.length === 0) return null;
 
     return (
         <>
@@ -89,16 +138,13 @@ function Testimonial() {
 
                     <div className="testimonial-slider">
                         <div className="testimonial-overflow">
+                            {/* ✅ isJumping ke basis par class change hogi */}
                             <div
                                 className={`testimonial-track ${
-                                    activeTestimonial === displayTestimonials.length
-                                        ? "testimonial-reset"
-                                        : ""
+                                    isJumping ? "testimonial-reset" : ""
                                 }`}
                                 style={{
-                                    transform: `translateX(-${
-                                        activeTestimonial * 100
-                                    }%)`
+                                    transform: `translateX(-${activeTestimonial * 100}%)`
                                 }}
                             >
                                 {sliderTestimonials.map((item, index) => (
@@ -114,11 +160,14 @@ function Testimonial() {
                                                     <div className="testimonial-left">
                                                         <div className="testimonial-image-wrapper">
                                                             <div className="testimonial-image-ring">
-                                                                {item.file_url ? (
+                                                                {item.image ? (
                                                                     <img
-                                                                        src={item.file_url}
+                                                                        src={item.image}
                                                                         alt={item.name || "Student"}
                                                                         className="testimonial-image"
+                                                                        onError={(e) => {
+                                                                            e.currentTarget.src = "https://via.placeholder.com/100?text=User";
+                                                                        }}
                                                                     />
                                                                 ) : (
                                                                     <div className="testimonial-placeholder">
@@ -140,7 +189,7 @@ function Testimonial() {
                                                         <div className="testimonial-head">
                                                             <div className="testimonial-head-info">
                                                                 <h3>{item.name}</h3>
-                                                                <p>{item.short_name}</p>
+                                                                <p>{item.role}</p>
                                                             </div>
 
                                                             <div className="testimonial-stars">
@@ -158,7 +207,7 @@ function Testimonial() {
                                                                 <i className="fa fa-quote-left"></i>
                                                             </div>
 
-                                                            <p>{item.short_intro}</p>
+                                                            <p>{item.review}</p>
                                                         </div>
 
                                                     </div>
@@ -177,6 +226,7 @@ function Testimonial() {
                                     type="button"
                                     className="testimonial-arrow"
                                     onClick={handlePrevious}
+                                    disabled={isJumping}
                                 >
                                     <i className="fa fa-arrow-left"></i>
                                 </button>
@@ -189,7 +239,9 @@ function Testimonial() {
                                             className={`testimonial-dot ${
                                                 currentIndex === index ? "active" : ""
                                             }`}
-                                            onClick={() => setActiveTestimonial(index)}
+                                            onClick={() => {
+                                                if(!isJumping) setActiveTestimonial(index);
+                                            }}
                                         />
                                     ))}
                                 </div>
@@ -198,6 +250,7 @@ function Testimonial() {
                                     type="button"
                                     className="testimonial-arrow"
                                     onClick={handleNext}
+                                    disabled={isJumping}
                                 >
                                     <i className="fa fa-arrow-right"></i>
                                 </button>
@@ -277,6 +330,7 @@ function Testimonial() {
                     will-change: transform;
                 }
 
+                /* ✅ Sirf tab lagta hai jab jump karna ho */
                 .testimonial-reset {
                     transition: none !important;
                 }
@@ -485,11 +539,16 @@ function Testimonial() {
                     font-size: 12px;
                 }
 
-                .testimonial-arrow:hover {
+                .testimonial-arrow:hover:not(:disabled) {
                     background: #01507c;
                     color: #fff;
                     border-color: #01507c;
                     transform: translateY(-2px);
+                }
+                
+                .testimonial-arrow:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
                 }
 
                 .testimonial-dots {

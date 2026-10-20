@@ -1,5 +1,5 @@
  import React, { useEffect, useState } from "react";
-import { getWebsiteContent } from "./HomeService";
+import {  getWebsiteContentdata } from "./HomeService";
 import { useSearchParams } from "react-router-dom";
 
 function News() {
@@ -24,7 +24,7 @@ function News() {
 
             if (!contentId) return;
 
-            const data = await getWebsiteContent(contentId);
+            const data = await getWebsiteContentdata(contentId);
 
             setNews(
                 (data || []).filter(item => item.is_active === true)

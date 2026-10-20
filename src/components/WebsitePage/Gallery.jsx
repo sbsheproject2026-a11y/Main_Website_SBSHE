@@ -1,5 +1,5 @@
  import React, { useEffect, useState } from "react";
-import { getWebsiteContent } from "./HomeService";
+import {   getWebsiteContentdata } from "./HomeService";
 import { useNavigate } from "react-router-dom";
 
 
@@ -27,7 +27,7 @@ const Gallery = () => {
 
             setLoading(true);
 
-            const data = await getWebsiteContent(22);
+            const data = await getWebsiteContentdata(22);
 
             const activeData = (data || []).filter(
                 (item) => item.is_active === true

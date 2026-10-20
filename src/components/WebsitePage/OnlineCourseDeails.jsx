@@ -1,6 +1,7 @@
  import React, { useEffect, useState } from "react";
-import { getCourses } from "./CourseServiceData";
+ 
 import { useLocation } from "react-router-dom";
+import { getCourses } from "./HomeService";
 
 function OnlineCourseDeails() {
     const location = useLocation();
