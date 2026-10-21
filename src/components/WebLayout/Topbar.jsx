@@ -617,6 +617,7 @@ function TopBar({
                     align-items: center;
                     margin-left: 0;
                     margin-right: 0;
+                    margin: 5px;
                 }
 
 

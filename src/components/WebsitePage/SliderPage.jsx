@@ -88,7 +88,7 @@ const slides = sliders.flatMap((item) =>
                 name: formData.name.trim(),
                 mobileNo: formData.mobileNo.trim(),
                 email: formData.email.trim(),
-                course: "Franchise Enquiry",
+               course: formData.course?.trim() ? "Franchise Enquiry" : formData.course,
                 remarks: formData.remarks.trim()
             };
 

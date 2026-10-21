@@ -52,11 +52,11 @@ function Footer() {
                             <div className="col-md-5 mb-5">
                                 <h5 className="text-primary text-uppercase mb-4" style={{ letterSpacing: "5px" }}>Information Links</h5>
                                 <div className="d-flex flex-column justify-content-start">
-                                    <Link className="text-white mb-2" to="/about-us"><i className="fa fa-angle-right mr-2"></i>About Us</Link>
+                                    <Link className="text-white mb-2" to="/approvals-achievements"><i className="fa fa-angle-right mr-2"></i>Approvals/Achievements</Link>
                                     <Link className="text-white mb-2" to="/programmes"><i className="fa fa-angle-right mr-2"></i>Programme</Link>
 
-                                    <Link className="text-white mb-2" to="/study-centres"><i className="fa fa-angle-right mr-2"></i>Study Centre</Link>
-                                    <Link className="text-white mb-2" to="/"><i className="fa fa-angle-right mr-2"></i>Student Support</Link>
+                                    <Link className="text-white mb-2" to="/study-centres"><i className="fa fa-angle-right mr-2"></i>Accredited Institute</Link>
+                                    <Link className="text-white mb-2" to="https://student.shaheedbhagatsinghhealthandeducation.com"><i className="fa fa-angle-right mr-2"></i>Student Support</Link>
                                     <Link className="text-white mb-2" to="https://sbshe.in/Rollno-Verification.aspx"><i className="fa fa-angle-right mr-2"></i>Result</Link>
                                      
                                     <Link className="text-white mb-2" to="/contact-us"><i className="fa fa-angle-right mr-2"></i>Contact Us</Link>
