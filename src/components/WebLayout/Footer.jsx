@@ -68,11 +68,11 @@ function Footer() {
                     <div className="col-md-4 mb-5">
                         <h5 className="text-primary text-uppercase mb-4" style={{ letterSpacing: "5px" }}>Usefull Links</h5>
                         <div className="d-flex flex-column justify-content-start">
-                             <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com/acc-apply"><i className="fa fa-angle-right mr-2"></i>Acc Registration</Link>  
-                            <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com"><i className="fa fa-angle-right mr-2"></i> Acc Login</Link>
+                             <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com/acc-apply"><i className="fa fa-angle-right mr-2"></i>Admission Consultant Registration</Link>  
+                            <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com"><i className="fa fa-angle-right mr-2"></i> Admission Consultant Login</Link>
 
-                            <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com/study-centre-apply"><i className="fa fa-angle-right mr-2"></i>Study Center Registration</Link>
-                            <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com"><i className="fa fa-angle-right mr-2"></i>Study Centres Login</Link>
+                            <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com/study-centre-apply"><i className="fa fa-angle-right mr-2"></i>Study Centre Registration</Link>
+                            <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com"><i className="fa fa-angle-right mr-2"></i>Study Centre Login</Link>
 
                             <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com/new-student-apply"><i className="fa fa-angle-right mr-2"></i>Student Registration</Link>
                             <Link className="text-white mb-2" to="https://soft.shaheedbhagatsinghhealthandeducation.com"><i className="fa fa-angle-right mr-2"></i>Student Login</Link>

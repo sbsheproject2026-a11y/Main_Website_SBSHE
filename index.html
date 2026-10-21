@@ -181,34 +181,47 @@
     <!-- =====================================================
          INITIAL LOADER STYLES
     ===================================================== -->
-    <style>
-      #initial-loader {
-        position: fixed;
-        inset: 0;
-        background: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 999999;
-      }
+   <style>
+  #initial-loader {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column; /* ✅ Logo aur text ko ek ke neeche ek dikhane ke liye */
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    gap: 20px; /* ✅ Logo aur text ke beech space */
+  }
 
-      #initial-loader img {
-        width: 180px;
-        height: auto;
-        animation: logoPulse 1.2s ease-in-out infinite alternate;
-      }
+  #initial-loader img {
+    width: 180px;
+    height: auto;
+    animation: logoPulse 1.2s ease-in-out infinite alternate;
+  }
 
-      @keyframes logoPulse {
-        from {
-          opacity: 0.5;
-          transform: scale(0.95);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
-    </style>
+  /* ✅ Text ki styling (jo pehle h1 thi) */
+  #initial-loader .loader-text {
+    font-size: 22px;
+    font-weight: 700;
+    color: #07567f; /* Aapki website ka theme color */
+    text-align: center;
+    margin: 0;
+    font-family: inherit;
+    padding: 0 20px;
+  }
+
+  @keyframes logoPulse {
+    from {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
   </head>
 
   <body>
@@ -217,6 +230,7 @@
         src="/assets/img/Logo.png"
         alt="Shaheed Bhagat Singh Health & Education"
       />
+  <div class="loader-text">Welcome to Shaheed Bhagat Singh Health and Education</div>
     </div>
     <div id="root"></div>
 

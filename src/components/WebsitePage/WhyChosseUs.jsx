@@ -1,5 +1,5 @@
  import React, { useEffect, useState } from "react";
-import {   getWebsiteContentdata } from "./HomeService";
+import { getWebsiteContentdata } from "./HomeService";
 import { Link } from "react-router-dom";
 
 function WhyChosseUs() {
@@ -30,148 +30,127 @@ function WhyChosseUs() {
     };
 
     // =========================================================
-    // ✅ Description ko PARAGRAPHS me convert karo (200 words limit)
+    // ✅ HTML ko exactly N words par cut karne ka function
+    // (Bullets, Numbers, Bold format ko break kiye bina)
     // =========================================================
-    const getLimitedDescription = (html, wordLimit = 100) => {
-        if (!html) return { paragraphs: [], truncated: false };
+    const truncateHtml = (html, wordLimit = 100) => {
+        if (!html || typeof document === 'undefined') return { html: html || "", isTruncated: false };
+        
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            let wordsCount = 0;
+            let isTruncated = false;
 
-        // HTML tags remove karo
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = html;
+            const traverse = (node) => {
+                if (isTruncated) return null;
 
-        // ✅ Original HTML se paragraphs nikalo
-        // (p, li, br → paragraphs)
-        const paragraphs = [];
-        let currentText = "";
-        let wordCount = 0;
-        let truncated = false;
-
-        // Saare elements ko traverse karo
-        const walker = document.createTreeWalker(
-            tempDiv,
-            NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
-            null,
-            false
-        );
-
-        const blockTags = ["P", "DIV", "LI", "BR", "H1", "H2", "H3", "H4", "H5", "H6"];
-        const nodes = [];
-        let node;
-
-        while ((node = walker.nextNode())) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                if (blockTags.includes(node.tagName)) {
-                    nodes.push({ type: "block" });
-                }
-            } else if (node.nodeType === Node.TEXT_NODE) {
-                const text = node.textContent.trim();
-                if (text) {
-                    nodes.push({ type: "text", value: text });
-                }
-            }
-        }
-
-        // ✅ Paragraphs banao
-        for (const n of nodes) {
-            if (n.type === "block") {
-                if (currentText.trim()) {
-                    paragraphs.push(currentText.trim());
-                    currentText = "";
-                }
-                continue;
-            }
-
-            if (n.type === "text") {
-                const words = n.value.split(/\s+/);
-
-                for (const word of words) {
-                    if (wordCount >= wordLimit) {
-                        truncated = true;
-                        break;
+                // Agar Text Node hai
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    const parts = text.split(/(\s+)/); // Space ke hisaab se split karo par space ko bhi bachao
+                    let newText = "";
+                    
+                    for (let part of parts) {
+                        if (part.trim() === "") {
+                            if (newText.length > 0 || wordsCount > 0) newText += part; // Spaces preserve karo
+                        } else {
+                            if (wordsCount < wordLimit) {
+                                newText += part;
+                                wordsCount++;
+                            } else {
+                                isTruncated = true;
+                                break;
+                            }
+                        }
                     }
-                    currentText += (currentText ? " " : "") + word;
-                    wordCount++;
+                    return newText ? document.createTextNode(newText) : null;
                 }
 
-                if (truncated) break;
+                // Agar Element Node hai (jaise <ul>, <li>, <p>, <strong>)
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    if (['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.tagName)) return null;
+                    
+                    const clone = node.cloneNode(false); // Tag copy karo
+                    let hasChild = false;
+
+                    for (let child of node.childNodes) {
+                        const newChild = traverse(child);
+                        if (newChild) {
+                            clone.appendChild(newChild);
+                            hasChild = true;
+                        }
+                        if (isTruncated && !newChild) break;
+                    }
+
+                    if (hasChild || ['BR', 'IMG', 'HR'].includes(node.tagName)) {
+                        return clone;
+                    }
+                    return null;
+                }
+                return null;
+            };
+
+            const container = document.createElement('div');
+            for (let child of doc.body.childNodes) {
+                const newChild = traverse(child);
+                if (newChild) container.appendChild(newChild);
+                if (isTruncated) break;
             }
-        }
 
-        // Last paragraph bhi push karo
-        if (currentText.trim()) {
-            paragraphs.push(currentText.trim());
-        }
+            // ✅ Khali tags (jaise khali <ul> ya <li>) ko remove karo
+            const cleanEmpty = (el) => {
+                const children = Array.from(el.children);
+                for (let child of children) {
+                    cleanEmpty(child);
+                    if (child.children.length === 0 && child.textContent.trim() === "" && !['BR', 'IMG', 'HR'].includes(child.tagName)) {
+                        child.remove();
+                    }
+                }
+            };
+            cleanEmpty(container);
 
-        return { paragraphs, truncated };
+            return { html: container.innerHTML, isTruncated: isTruncated };
+        } catch (e) {
+            console.error("Error truncating HTML", e);
+            return { html, isTruncated: false };
+        }
     };
 
-    // ✅ Read More link — menu_id ke hisaab se (Updated for safety)
+    // ✅ Read More link
     const getReadMoreLink = (item) => {
-        // menu 23 → chairman-message (Check both id and productTypeId)
-        if (item.productTypeId === 1145  ) {
-            return "/about/chairman-message";
-        }
-
-        // menu 43 → intro-shaheed-bhagat-singh (Check both id and productTypeId)
-        if (item.productTypeId === 1151 ) {
-            return "/about/intro-shaheed-bhagat-singh";
-        }
-
-        // Fallback (slug ya menu_slug)
+        if (item.productTypeId === 1145) return "/about/chairman-message";
+        if (item.productTypeId === 1151) return "/about/intro-shaheed-bhagat-singh";
         return `/about/${item.slug || item.menu_slug || ""}`;
     };
 
-    // ✅ Agar koi data nahi hai to kuch bhi render mat karo
     if (!whyChosseUs || whyChosseUs.length === 0) {
         return null;
     }
 
     return (
         <>
-            {/* ✅ Har item ka apna section */}
             {whyChosseUs.map((item, index) => {
-                // ✅ 1. Array ke pehle element (index 0) ko access karo
                 const doc = item.productCategoryDocuments?.[0];
-
-                // ✅ 2. File ka URL nikaalo (Agar fileupload hai toh wo, warna kuch nahi)
                 const fileUrl = doc?.fileupload || "";
-
-                // ✅ 3. Check karo ki file ek IMAGE hai ya PDF
-                // (Kyunki agar PDF hui aur humne <img> tag me daala, toh image break ho jayegi)
                 const isImage = fileUrl && /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(fileUrl);
-
-                // ✅ 4. Agar image hai tabhi layout me image dikhao
                 const hasImage = isImage;
-
-                // ✅ Description — paragraphs + truncated
-                const { paragraphs, truncated } = getLimitedDescription(
-                    item.descrption,
-                    100
-                );
-
                 const readMoreLink = getReadMoreLink(item);
 
+                // ✅ Yahan function call kiya
+                const { html: truncatedHtml, isTruncated } = truncateHtml(item.descrption, 100);
+
                 return (
-                    <section
-                        className="why-choose-section"
-                        key={item.id ?? index}
-                    >
+                    <section className="why-choose-section" key={item.id ?? index}>
                         {/* BACKGROUND DECORATION */}
                         <div className="why-bg-circle why-bg-circle-one"></div>
                         <div className="why-bg-circle why-bg-circle-two"></div>
 
                         <div className="why-choose-container">
-                            {/* ✅ Layout class — image hai ya nahi */}
-                            <div
-                                className={
-                                    hasImage
-                                        ? "why-choose-row"
-                                        : "why-choose-row why-choose-row-no-image"
-                                }
-                            >
-                                {/* =================================================
-                                    IMAGE — sirf tab jab image ho
-                                ================================================== */}
+                            <div className={hasImage ? "why-choose-row" : "why-choose-row why-choose-row-no-image"}>
+                                
+                                {/* IMAGE */}
                                 {hasImage && (
                                     <div className="why-choose-image-col">
                                         <div className="why-choose-image-wrapper">
@@ -182,34 +161,23 @@ function WhyChosseUs() {
 
                                             <img
                                                 src={fileUrl}
-                                                alt={
-                                                    item.name ||
-                                                    "Shaheed Bhagat Singh Health and Education"
-                                                }
+                                                alt={item.name || "Shaheed Bhagat Singh Health and Education"}
                                                 className="why-choose-image"
-                                                onError={(e) => {
-                                                    e.currentTarget.style.display = "none";
-                                                }}
+                                                onError={(e) => { e.currentTarget.style.display = "none"; }}
                                             />
                                         </div>
                                     </div>
                                 )}
 
-                                {/* =================================================
-                                    CONTENT — always show
-                                ================================================== */}
+                                {/* CONTENT */}
                                 <div className="why-choose-content-col">
                                     <div className="why-choose-content">
                                         <div className="section-label">
                                             <span className="label-line"></span>
-                                            <span className="label-text">
-                                                {item.productType || ""}
-                                            </span>
+                                            <span className="label-text">{item.productType || ""}</span>
                                         </div>
 
-                                        <h2 className="why-choose-title">
-                                            {item.name}
-                                        </h2>
+                                        <h2 className="why-choose-title">{item.name}</h2>
 
                                         <div className="heading-decoration">
                                             <span className="heading-dot"></span>
@@ -217,26 +185,17 @@ function WhyChosseUs() {
                                             <span className="heading-dot"></span>
                                         </div>
 
-                                        {/* ✅ Description — PROPER PARAGRAPHS me */}
-                                        <div className="about-description">
-                                            {paragraphs.map((para, i) => (
-                                                <p key={i}>{para}</p>
-                                            ))}
+                                        {/* ✅ HTML Content (Formatted with Bullets/Numbers) */}
+                                        <div 
+                                            className="about-description"
+                                            dangerouslySetInnerHTML={{ __html: truncatedHtml }}
+                                        />
 
-                                            {truncated && (
-                                                <p className="description-truncated">
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        {/* ✅ Read More button */}
-                                        {truncated && (
+                                        {/* ✅ Read More button (sirf tab jab text limit se bada ho) */}
+                                        {isTruncated && (
                                             <Link
                                                 to={readMoreLink}
-                                                state={{ 
-                                                    id: item.productTypeId,
-                                               
-                                                }} // 👈 Dono IDs state me pass kar di hain
+                                                state={{ id: item.productTypeId }}
                                                 className="read-more-btn"
                                             >
                                                 <span>Read More</span>
@@ -258,7 +217,7 @@ function WhyChosseUs() {
             })}
 
             {/* =====================================================
-                CSS
+                COMPLETE CSS
             ====================================================== */}
             <style>
                 {`
@@ -319,14 +278,11 @@ function WhyChosseUs() {
                 .why-choose-row {
                     width: 100%;
                     display: grid;
-                    grid-template-columns:
-                        minmax(0, 0.95fr)
-                        minmax(0, 1.05fr);
+                    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
                     align-items: center;
                     gap: 70px;
                 }
 
-                /* ✅ ROW WITHOUT IMAGE — content full width, LEFT aligned */
                 .why-choose-row-no-image {
                     grid-template-columns: 1fr;
                     gap: 0;
@@ -344,14 +300,8 @@ function WhyChosseUs() {
                     text-align: left;
                 }
 
-                .why-choose-row-no-image .section-label {
-                    justify-content: flex-start;
-                }
-
-                .why-choose-row-no-image .heading-decoration {
-                    justify-content: flex-start;
-                }
-
+                .why-choose-row-no-image .section-label,
+                .why-choose-row-no-image .heading-decoration,
                 .why-choose-row-no-image .why-choose-footer {
                     justify-content: flex-start;
                 }
@@ -366,9 +316,6 @@ function WhyChosseUs() {
                     justify-content: center;
                 }
 
-                /* =====================================================
-                   IMAGE WRAPPER
-                ====================================================== */
                 .why-choose-image-wrapper {
                     position: relative;
                     width: 100%;
@@ -381,9 +328,6 @@ function WhyChosseUs() {
                     box-sizing: border-box;
                 }
 
-                /* =====================================================
-                   MAIN IMAGE
-                ====================================================== */
                 .why-choose-image {
                     position: relative;
                     width: 100%;
@@ -398,12 +342,11 @@ function WhyChosseUs() {
                     border-radius: 0;
                     box-shadow: none;
                     z-index: 3;
-                    transition:
-                        transform 0.4s ease;
+                    transition: transform 0.4s ease;
                 }
 
                 /* =====================================================
-                   YELLOW DECORATION
+                   DECORATIONS
                 ====================================================== */
                 .image-decoration {
                     position: absolute;
@@ -421,9 +364,6 @@ function WhyChosseUs() {
                     opacity: 0.18;
                 }
 
-                /* =====================================================
-                   BLUE DECORATION
-                ====================================================== */
                 .decoration-two {
                     width: 75px;
                     height: 75px;
@@ -434,9 +374,6 @@ function WhyChosseUs() {
                     opacity: 0.12;
                 }
 
-                /* =====================================================
-                   DOT PATTERN
-                ====================================================== */
                 .image-dots {
                     position: absolute;
                     width: 6px;
@@ -445,51 +382,26 @@ function WhyChosseUs() {
                     background: #07567f;
                     z-index: 1;
                     opacity: 0.35;
-                    box-shadow:
-                        18px 0 0 #07567f,
-                        36px 0 0 #07567f,
-                        0 18px 0 #07567f,
-                        18px 18px 0 #07567f,
-                        36px 18px 0 #07567f,
-                        0 36px 0 #07567f,
-                        18px 36px 0 #07567f,
-                        36px 36px 0 #07567f;
+                    box-shadow: 18px 0 0 #07567f, 36px 0 0 #07567f, 0 18px 0 #07567f, 18px 18px 0 #07567f, 36px 18px 0 #07567f, 0 36px 0 #07567f, 18px 36px 0 #07567f, 36px 36px 0 #07567f;
                 }
 
-                .image-dots-one {
-                    left: 5px;
-                    top: 35px;
-                }
-
+                .image-dots-one { left: 5px; top: 35px; }
+                
                 .image-dots-two {
                     right: 8px;
                     bottom: 45px;
                     background: #ffd33d;
-                    box-shadow:
-                        18px 0 0 #ffd33d,
-                        36px 0 0 #ffd33d,
-                        0 18px 0 #ffd33d,
-                        18px 18px 0 #ffd33d,
-                        36px 18px 0 #ffd33d,
-                        0 36px 0 #ffd33d,
-                        18px 36px 0 #ffd33d,
-                        36px 36px 0 #ffd33d;
+                    box-shadow: 18px 0 0 #ffd33d, 36px 0 0 #ffd33d, 0 18px 0 #ffd33d, 18px 18px 0 #ffd33d, 36px 18px 0 #ffd33d, 0 36px 0 #ffd33d, 18px 36px 0 #ffd33d, 36px 36px 0 #ffd33d;
                 }
 
                 /* =====================================================
                    CONTENT COLUMN
                 ====================================================== */
-                .why-choose-content-col {
-                    width: 100%;
-                }
-
-                .why-choose-content {
-                    width: 100%;
-                    max-width: 650px;
-                }
+                .why-choose-content-col { width: 100%; }
+                .why-choose-content { width: 100%; max-width: 650px; }
 
                 /* =====================================================
-                   SECTION LABEL
+                   LABELS & TITLE
                 ====================================================== */
                 .section-label {
                     display: flex;
@@ -515,9 +427,6 @@ function WhyChosseUs() {
                     text-transform: uppercase;
                 }
 
-                /* =====================================================
-                   MAIN TITLE
-                ====================================================== */
                 .why-choose-title {
                     margin: 0;
                     color: #063d59;
@@ -527,9 +436,6 @@ function WhyChosseUs() {
                     letter-spacing: -0.3px;
                 }
 
-                /* =====================================================
-                   HEADING DECORATION
-                ====================================================== */
                 .heading-decoration {
                     display: flex;
                     align-items: center;
@@ -553,13 +459,34 @@ function WhyChosseUs() {
                 }
 
                 /* =====================================================
-                   DESCRIPTION — proper paragraphs
+                   DESCRIPTION (HTML RENDERING WITH BULLETS)
                 ====================================================== */
                 .about-description {
                     color: #555d63;
                     font-size: 15px;
                     line-height: 1.85;
                     font-weight: 400;
+                }
+
+                /* ✅ Bullet aur Number lists ko show karne ke liye */
+                .about-description ul {
+                    list-style-type: disc !important;
+                    margin-top: 10px !important;
+                    margin-bottom: 16px !important;
+                    padding-left: 25px !important;
+                }
+
+                .about-description ol {
+                    list-style-type: decimal !important;
+                    margin-top: 10px !important;
+                    margin-bottom: 16px !important;
+                    padding-left: 25px !important;
+                }
+
+                .about-description li {
+                    margin-bottom: 8px !important;
+                    display: list-item !important; 
+                    text-align: left;
                 }
 
                 .about-description p {
@@ -572,12 +499,7 @@ function WhyChosseUs() {
                     margin-bottom: 0;
                 }
 
-                .about-description .description-truncated {
-                    margin: 0;
-                    color: #555d63;
-                }
-
-                .about-description strong,
+                .about-description strong, 
                 .about-description b {
                     color: #063d59;
                     font-weight: 700;
@@ -589,19 +511,8 @@ function WhyChosseUs() {
                     text-decoration: none;
                 }
 
-                .about-description ul,
-                .about-description ol {
-                    margin-top: 10px;
-                    margin-bottom: 15px;
-                    padding-left: 22px;
-                }
-
-                .about-description li {
-                    margin-bottom: 7px;
-                }
-
                 /* =====================================================
-                   ✅ READ MORE BUTTON
+                   READ MORE BUTTON
                 ====================================================== */
                 .read-more-btn {
                     display: inline-flex;
@@ -669,258 +580,70 @@ function WhyChosseUs() {
                 }
 
                 /* =====================================================
-                   LAPTOP
+                   RESPONSIVE (LAPTOP, TABLET, MOBILE)
                 ====================================================== */
                 @media (max-width: 1200px) {
-                    .why-choose-section {
-                        padding: 65px 0;
-                    }
-
-                    .why-choose-row {
-                        gap: 45px;
-                    }
-
-                    .why-choose-image-wrapper {
-                        max-width: 460px;
-                        min-height: 350px;
-                    }
-
-                    .why-choose-image {
-                        max-width: 440px;
-                        max-height: 390px;
-                    }
-
-                    .why-choose-title {
-                        font-size: 31px;
-                    }
-
-                    .about-description {
-                        font-size: 14px;
-                        line-height: 1.8;
-                    }
+                    .why-choose-section { padding: 65px 0; }
+                    .why-choose-row { gap: 45px; }
+                    .why-choose-image-wrapper { max-width: 460px; min-height: 350px; }
+                    .why-choose-image { max-width: 440px; max-height: 390px; }
+                    .why-choose-title { font-size: 31px; }
+                    .about-description { font-size: 14px; line-height: 1.8; }
                 }
 
-                /* =====================================================
-                   TABLET
-                ====================================================== */
                 @media (max-width: 991px) {
-                    .why-choose-section {
-                        padding: 55px 0;
-                    }
-
-                    .why-choose-row {
-                        grid-template-columns: 1fr;
-                        gap: 40px;
-                    }
-
-                    .why-choose-row-no-image .why-choose-content-col {
-                        max-width: 100%;
-                    }
-
-                    /* IMAGE */
-                    .why-choose-image-wrapper {
-                        max-width: 620px;
-                        min-height: auto;
-                        padding: 10px;
-                    }
-
-                    .why-choose-image {
-                        max-width: 560px;
-                        max-height: 400px;
-                    }
-
-                    .decoration-one {
-                        width: 75px;
-                        height: 75px;
-                        left: 5px;
-                        bottom: 5px;
-                    }
-
-                    .decoration-two {
-                        width: 65px;
-                        height: 65px;
-                        right: 5px;
-                        top: 5px;
-                    }
-
-                    /* CONTENT */
-                    .why-choose-content {
-                        max-width: 100%;
-                    }
-
-                    .why-choose-title {
-                        font-size: 30px;
-                    }
+                    .why-choose-section { padding: 55px 0; }
+                    .why-choose-row { grid-template-columns: 1fr; gap: 40px; }
+                    .why-choose-row-no-image .why-choose-content-col { max-width: 100%; }
+                    .why-choose-image-wrapper { max-width: 620px; min-height: auto; padding: 10px; }
+                    .why-choose-image { max-width: 560px; max-height: 400px; }
+                    .decoration-one { width: 75px; height: 75px; left: 5px; bottom: 5px; }
+                    .decoration-two { width: 65px; height: 65px; right: 5px; top: 5px; }
+                    .why-choose-content { max-width: 100%; }
+                    .why-choose-title { font-size: 30px; }
                 }
 
-                /* =====================================================
-                   MOBILE
-                ====================================================== */
                 @media (max-width: 767px) {
-                    .why-choose-section {
-                        padding: 42px 0;
-                    }
-
-                    .why-choose-container {
-                        padding-left: 14px;
-                        padding-right: 14px;
-                    }
-
-                    .why-choose-row {
-                        gap: 30px;
-                    }
-
-                    /* IMAGE */
-                    .why-choose-image-wrapper {
-                        width: 100%;
-                        max-width: 100%;
-                        min-height: auto;
-                        padding: 5px;
-                    }
-
-                    .why-choose-image {
-                        width: 100%;
-                        max-width: 100%;
-                        max-height: 300px;
-                        object-fit: contain;
-                    }
-
-                    /* DECORATIONS */
-                    .decoration-one {
-                        width: 55px;
-                        height: 55px;
-                        left: 0;
-                        bottom: 5px;
-                    }
-
-                    .decoration-two {
-                        width: 48px;
-                        height: 48px;
-                        right: 0;
-                        top: 5px;
-                    }
-
+                    .why-choose-section { padding: 42px 0; }
+                    .why-choose-container { padding-left: 14px; padding-right: 14px; }
+                    .why-choose-row { gap: 30px; }
+                    
+                    .why-choose-image-wrapper { width: 100%; max-width: 100%; min-height: auto; padding: 5px; }
+                    .why-choose-image { width: 100%; max-width: 100%; max-height: 300px; object-fit: contain; }
+                    
+                    .decoration-one { width: 55px; height: 55px; left: 0; bottom: 5px; }
+                    .decoration-two { width: 48px; height: 48px; right: 0; top: 5px; }
+                    
                     .image-dots {
-                        width: 4px;
-                        height: 4px;
-                        box-shadow:
-                            13px 0 0 #07567f,
-                            26px 0 0 #07567f,
-                            0 13px 0 #07567f,
-                            13px 13px 0 #07567f,
-                            26px 13px 0 #07567f,
-                            0 26px 0 #07567f,
-                            13px 26px 0 #07567f,
-                            26px 26px 0 #07567f;
+                        width: 4px; height: 4px;
+                        box-shadow: 13px 0 0 #07567f, 26px 0 0 #07567f, 0 13px 0 #07567f, 13px 13px 0 #07567f, 26px 13px 0 #07567f, 0 26px 0 #07567f, 13px 26px 0 #07567f, 26px 26px 0 #07567f;
                     }
-
-                    .image-dots-one {
-                        left: 2px;
-                        top: 25px;
-                    }
-
+                    .image-dots-one { left: 2px; top: 25px; }
                     .image-dots-two {
-                        right: 3px;
-                        bottom: 30px;
-                        box-shadow:
-                            13px 0 0 #ffd33d,
-                            26px 0 0 #ffd33d,
-                            0 13px 0 #ffd33d,
-                            13px 13px 0 #ffd33d,
-                            26px 13px 0 #ffd33d,
-                            0 26px 0 #ffd33d,
-                            13px 26px 0 #ffd33d,
-                            26px 26px 0 #ffd33d;
+                        right: 3px; bottom: 30px;
+                        box-shadow: 13px 0 0 #ffd33d, 26px 0 0 #ffd33d, 0 13px 0 #ffd33d, 13px 13px 0 #ffd33d, 26px 13px 0 #ffd33d, 0 26px 0 #ffd33d, 13px 26px 0 #ffd33d, 26px 26px 0 #ffd33d;
                     }
 
-                    /* CONTENT */
-                    .section-label {
-                        gap: 8px;
-                        margin-bottom: 10px;
-                    }
-
-                    .label-line {
-                        width: 25px;
-                        height: 2px;
-                    }
-
-                    .label-text {
-                        font-size: 10px;
-                        letter-spacing: 1.8px;
-                    }
-
-                    .why-choose-title {
-                        font-size: 25px;
-                        line-height: 1.3;
-                    }
-
-                    .heading-decoration {
-                        margin: 12px 0 17px;
-                    }
-
-                    .about-description {
-                        font-size: 13px;
-                        line-height: 1.75;
-                    }
-
-                    .about-description p {
-                        margin-bottom: 13px;
-                        text-align: left;
-                    }
-
-                    .why-choose-footer {
-                        margin-top: 20px;
-                    }
-
-                    .read-more-btn {
-                        font-size: 12px;
-                        padding: 8px 16px;
-                    }
+                    .section-label { gap: 8px; margin-bottom: 10px; }
+                    .label-line { width: 25px; height: 2px; }
+                    .label-text { font-size: 10px; letter-spacing: 1.8px; }
+                    .why-choose-title { font-size: 25px; line-height: 1.3; }
+                    .heading-decoration { margin: 12px 0 17px; }
+                    .about-description { font-size: 13px; line-height: 1.75; }
+                    .about-description p { margin-bottom: 13px; text-align: left; }
+                    .why-choose-footer { margin-top: 20px; }
+                    .read-more-btn { font-size: 12px; padding: 8px 16px; }
                 }
 
-                /* =====================================================
-                   SMALL MOBILE
-                ====================================================== */
                 @media (max-width: 480px) {
-                    .why-choose-section {
-                        padding: 35px 0;
-                    }
-
-                    .why-choose-image-wrapper {
-                        padding: 0;
-                    }
-
-                    .why-choose-image {
-                        width: 100%;
-                        max-height: 250px;
-                    }
-
-                    .decoration-one {
-                        width: 45px;
-                        height: 45px;
-                        left: -3px;
-                        bottom: 2px;
-                    }
-
-                    .decoration-two {
-                        width: 40px;
-                        height: 40px;
-                        right: -3px;
-                        top: 2px;
-                    }
-
-                    .why-choose-title {
-                        font-size: 22px;
-                    }
-
-                    .about-description {
-                        font-size: 12.5px;
-                        line-height: 1.7;
-                    }
-
-                    .image-dots {
-                        display: none;
-                    }
+                    .why-choose-section { padding: 35px 0; }
+                    .why-choose-image-wrapper { padding: 0; }
+                    .why-choose-image { width: 100%; max-height: 250px; }
+                    .decoration-one { width: 45px; height: 45px; left: -3px; bottom: 2px; }
+                    .decoration-two { width: 40px; height: 40px; right: -3px; top: 2px; }
+                    .why-choose-title { font-size: 22px; }
+                    .about-description { font-size: 12.5px; line-height: 1.7; }
+                    .image-dots { display: none; }
                 }
                 `}
             </style>
