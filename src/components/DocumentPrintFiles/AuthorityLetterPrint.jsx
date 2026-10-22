@@ -1,6 +1,6 @@
  import React, { useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import jsPDF from "jspdf";
+// ❌ Line hata di: import jsPDF from "jspdf"; 
 import { printAuthorityLetterApi } from "./PrintService";
 
 const AuthorityLetterPrint = () => {
@@ -363,11 +363,6 @@ const AuthorityLetterPrint = () => {
             // FIELDS
             // ==========================================
             const FIELDS = {
- 
-                // =========================================================
-                // ✅ CERTIFICATE OF AUTHORIZATION FIELDS
-                // ❌ Koi fallback nahi — sirf result se aayega
-                // =========================================================
                 registrationLine: {
                     text: result.registrationLine || "",
                     x: 10,
@@ -398,7 +393,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 certifyLine: {
                     text: result.certifyLine || "",
                     x: 50,
@@ -409,7 +403,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 fatherName: {
                     text: result.fatherName || "",
                     x: 50,
@@ -420,7 +413,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 relacition: {
                     text: result.relacition || "",
                     x: 50,
@@ -431,7 +423,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 fatherName1: {
                     text: result.fatherName1 || "",
                     x: 50,
@@ -442,7 +433,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 nametext: {
                     text: "Centre Name : ",
                     x: 7,
@@ -467,7 +457,6 @@ const AuthorityLetterPrint = () => {
                     lineHeight: 2.5,
                     fontFamily: "Arial",
                 },
-
                 addressresult: {
                     text: "Address : " || "",
                     x: 7,
@@ -492,9 +481,6 @@ const AuthorityLetterPrint = () => {
                     wrapWords: 10,
                     lineHeight: 2,
                 },
-
-
-
                 centreAddress: {
                     text: result.centreAddress || "",
                     x: 50,
@@ -519,7 +505,6 @@ const AuthorityLetterPrint = () => {
                     wrapWords: 5,
                     lineHeight: 2.5,
                 },
-
                 appointedLine: {
                     text: result.appointedLine || "",
                     x: 50,
@@ -532,7 +517,6 @@ const AuthorityLetterPrint = () => {
                     wrapWords: 8,
                     lineHeight: 3,
                 },
-
                 endDate: {
                     text: result.endDate || "",
                     x: 50,
@@ -543,10 +527,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
-
-
-
                 centreName: {
                     text: result.centreName || "",
                     x: 50,
@@ -559,7 +539,6 @@ const AuthorityLetterPrint = () => {
                     wrapWords: 5,
                     lineHeight: 2.5,
                 },
-
                 selfImage: {
                     image: result.selfImage || "",
                     x: 11,
@@ -567,7 +546,6 @@ const AuthorityLetterPrint = () => {
                     width: 25,
                     height: 30,
                 },
-
                 qrImage: {
                     image: result.qrimage || "",
                     x: 89,
@@ -575,8 +553,6 @@ const AuthorityLetterPrint = () => {
                     width: 25,
                     height: 25,
                 },
-
-
                 signatoryLine: {
                     text: result.signatoryLine || "",
                     x: 83,
@@ -587,7 +563,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 officeAddress: {
                     text: result.officeAddress || "",
                     x: 50,
@@ -595,11 +570,9 @@ const AuthorityLetterPrint = () => {
                     align: "center",
                     maxWidth: 180,
                     fontSize: 12,
-
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 corporateOffice: {
                     text: result.corporateOffice || "",
                     x: 50,
@@ -610,7 +583,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 emailLine: {
                     text: result.emailLine || "",
                     x: 50,
@@ -621,7 +593,6 @@ const AuthorityLetterPrint = () => {
                     fontStyle: "bold",
                     fontFamily: "Arial",
                 },
-
                 websiteLine: {
                     text: result.websiteLine || "",
                     x: 50,
@@ -638,8 +609,13 @@ const AuthorityLetterPrint = () => {
             // BACKGROUND
             // ==========================================
             const backgroundImage = await loadImage(
-                "/assets/Documents/AuthorityLetter1.jpeg"
+                "/assets/Documents/AuthorityLetter1.webp"
             );
+
+            // ==========================================
+            // ✅ NEW: DYNAMIC IMPORT FOR JSPDF
+            // ==========================================
+            const { jsPDF } = await import("jspdf");
 
             // ==========================================
             // CREATE PDF — A4
@@ -683,7 +659,6 @@ const AuthorityLetterPrint = () => {
             // TEXT FIELDS — SAARE
             // ==========================================
             [
-                // ✅ Authority Letter fields
                 FIELDS.name,
                 FIELDS.nametext,
                 FIELDS.address,
@@ -695,8 +670,6 @@ const AuthorityLetterPrint = () => {
                 FIELDS.entityType,
                 FIELDS.centreName,
                 FIELDS.enrollmentNo,
-
-                // ✅ Certificate of Authorization fields
                 FIELDS.registrationLine,
                 FIELDS.certificateTitle,
                 FIELDS.certifyLine,

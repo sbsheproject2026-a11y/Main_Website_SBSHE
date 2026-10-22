@@ -132,7 +132,7 @@ function Result() {
                                 <div className="text-center mt-4">
                                     <small className="text-muted">
                                         🔒 Your information is securely verified
-                                        with SBSHE records.
+                                        with Shaheed Bhagat Singh Health & Education records.
                                     </small>
                                 </div>
 

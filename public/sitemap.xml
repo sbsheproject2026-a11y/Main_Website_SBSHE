@@ -1,0 +1,69 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <!-- ================= STATIC PAGES ================= -->
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/programmes</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/approvals-achievements</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/online-programmes</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/study-centres</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/announcements</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- ================= DYNAMIC ABOUT US PAGES ================= -->
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/about/chairman-message</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/about/intro-shaheed-bhagat-singh</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ================= DYNAMIC DEPARTMENT PAGES (Examples) ================= -->
+  <!-- Agar aapke paas department ke specific pages hain, toh unko aise add karein: -->
+  <!--
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/department/agriculture</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://shaheedbhagatsinghhealthandeducation.com/department/information-technology</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  -->
+
+</urlset>

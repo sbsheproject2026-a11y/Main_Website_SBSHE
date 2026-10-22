@@ -16,7 +16,6 @@ function WhyChosseUs() {
                 getWebsiteContentdata(1151),
             ]);
 
-            // ✅ Dono ka data merge + filter
             const merged = [
                 ...(data23 || []),
                 ...(data43 || []),
@@ -29,10 +28,6 @@ function WhyChosseUs() {
         }
     };
 
-    // =========================================================
-    // ✅ HTML ko exactly N words par cut karne ka function
-    // (Bullets, Numbers, Bold format ko break kiye bina)
-    // =========================================================
     const truncateHtml = (html, wordLimit = 100) => {
         if (!html || typeof document === 'undefined') return { html: html || "", isTruncated: false };
         
@@ -46,15 +41,14 @@ function WhyChosseUs() {
             const traverse = (node) => {
                 if (isTruncated) return null;
 
-                // Agar Text Node hai
                 if (node.nodeType === Node.TEXT_NODE) {
                     const text = node.textContent;
-                    const parts = text.split(/(\s+)/); // Space ke hisaab se split karo par space ko bhi bachao
+                    const parts = text.split(/(\s+)/); 
                     let newText = "";
                     
                     for (let part of parts) {
                         if (part.trim() === "") {
-                            if (newText.length > 0 || wordsCount > 0) newText += part; // Spaces preserve karo
+                            if (newText.length > 0 || wordsCount > 0) newText += part; 
                         } else {
                             if (wordsCount < wordLimit) {
                                 newText += part;
@@ -68,11 +62,10 @@ function WhyChosseUs() {
                     return newText ? document.createTextNode(newText) : null;
                 }
 
-                // Agar Element Node hai (jaise <ul>, <li>, <p>, <strong>)
                 if (node.nodeType === Node.ELEMENT_NODE) {
                     if (['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.tagName)) return null;
                     
-                    const clone = node.cloneNode(false); // Tag copy karo
+                    const clone = node.cloneNode(false); 
                     let hasChild = false;
 
                     for (let child of node.childNodes) {
@@ -99,7 +92,6 @@ function WhyChosseUs() {
                 if (isTruncated) break;
             }
 
-            // ✅ Khali tags (jaise khali <ul> ya <li>) ko remove karo
             const cleanEmpty = (el) => {
                 const children = Array.from(el.children);
                 for (let child of children) {
@@ -118,7 +110,6 @@ function WhyChosseUs() {
         }
     };
 
-    // ✅ Read More link
     const getReadMoreLink = (item) => {
         if (item.productTypeId === 1145) return "/about/chairman-message";
         if (item.productTypeId === 1151) return "/about/intro-shaheed-bhagat-singh";
@@ -138,19 +129,16 @@ function WhyChosseUs() {
                 const hasImage = isImage;
                 const readMoreLink = getReadMoreLink(item);
 
-                // ✅ Yahan function call kiya
                 const { html: truncatedHtml, isTruncated } = truncateHtml(item.descrption, 100);
 
                 return (
                     <section className="why-choose-section" key={item.id ?? index}>
-                        {/* BACKGROUND DECORATION */}
                         <div className="why-bg-circle why-bg-circle-one"></div>
                         <div className="why-bg-circle why-bg-circle-two"></div>
 
                         <div className="why-choose-container">
                             <div className={hasImage ? "why-choose-row" : "why-choose-row why-choose-row-no-image"}>
                                 
-                                {/* IMAGE */}
                                 {hasImage && (
                                     <div className="why-choose-image-col">
                                         <div className="why-choose-image-wrapper">
@@ -159,17 +147,20 @@ function WhyChosseUs() {
                                             <span className="image-dots image-dots-one"></span>
                                             <span className="image-dots image-dots-two"></span>
 
+                                            {/* ✅ FIX: Added loading="lazy", width & height to prevent CLS */}
                                             <img
                                                 src={fileUrl}
                                                 alt={item.name || "Shaheed Bhagat Singh Health and Education"}
                                                 className="why-choose-image"
+                                                loading="lazy"
+                                                width="480"
+                                                height="430"
                                                 onError={(e) => { e.currentTarget.style.display = "none"; }}
                                             />
                                         </div>
                                     </div>
                                 )}
 
-                                {/* CONTENT */}
                                 <div className="why-choose-content-col">
                                     <div className="why-choose-content">
                                         <div className="section-label">
@@ -185,18 +176,18 @@ function WhyChosseUs() {
                                             <span className="heading-dot"></span>
                                         </div>
 
-                                        {/* ✅ HTML Content (Formatted with Bullets/Numbers) */}
                                         <div 
                                             className="about-description"
                                             dangerouslySetInnerHTML={{ __html: truncatedHtml }}
                                         />
 
-                                        {/* ✅ Read More button (sirf tab jab text limit se bada ho) */}
+                                        {/* ✅ FIX: Added aria-label for SEO & Accessibility */}
                                         {isTruncated && (
                                             <Link
                                                 to={readMoreLink}
                                                 state={{ id: item.productTypeId }}
                                                 className="read-more-btn"
+                                                aria-label={`Read more about ${item.name}`}
                                             >
                                                 <span>Read More</span>
                                                 <i className="fas fa-arrow-right"></i>
@@ -216,9 +207,6 @@ function WhyChosseUs() {
                 );
             })}
 
-            {/* =====================================================
-                COMPLETE CSS
-            ====================================================== */}
             <style>
                 {`
                 /* =====================================================
@@ -459,56 +447,96 @@ function WhyChosseUs() {
                 }
 
                 /* =====================================================
-                   DESCRIPTION (HTML RENDERING WITH BULLETS)
+                   ✅ DESCRIPTION (DYNAMIC TYPOGRAPHY FIX)
                 ====================================================== */
                 .about-description {
                     color: #555d63;
                     font-size: 15px;
                     line-height: 1.85;
                     font-weight: 400;
+                    overflow-wrap: break-word;
                 }
 
-                /* ✅ Bullet aur Number lists ko show karne ke liye */
-                .about-description ul {
-                    list-style-type: disc !important;
-                    margin-top: 10px !important;
+                .about-description h1,
+                .about-description h2,
+                .about-description h3,
+                .about-description h4,
+                .about-description h5,
+                .about-description h6 {
+                    color: #063d59 !important;
+                    font-weight: 700 !important;
+                    line-height: 1.3 !important;
+                    margin-top: 20px !important;
+                    margin-bottom: 12px !important;
+                    text-transform: none !important;
+                }
+
+                .about-description h1 { font-size: 24px !important; }
+                .about-description h2 { font-size: 22px !important; }
+                .about-description h3 { font-size: 20px !important; }
+                .about-description h4,
+                .about-description h5,
+                .about-description h6 { font-size: 18px !important; }
+                
+                .about-description h1:first-child,
+                .about-description h2:first-child,
+                .about-description h3:first-child {
+                    margin-top: 0 !important;
+                }
+
+                .about-description p {
+                    margin-top: 0 !important;
                     margin-bottom: 16px !important;
-                    padding-left: 25px !important;
+                    text-align: justify !important; 
+                    font-size: inherit !important; 
+                    line-height: inherit !important;
+                    color: inherit !important;
                 }
 
+                .about-description p:last-child {
+                    margin-bottom: 0 !important;
+                }
+
+                .about-description ul,
                 .about-description ol {
-                    list-style-type: decimal !important;
                     margin-top: 10px !important;
                     margin-bottom: 16px !important;
                     padding-left: 25px !important;
                 }
+
+                .about-description ul { list-style-type: disc !important; }
+                .about-description ol { list-style-type: decimal !important; }
 
                 .about-description li {
                     margin-bottom: 8px !important;
                     display: list-item !important; 
-                    text-align: left;
-                }
-
-                .about-description p {
-                    margin-top: 0;
-                    margin-bottom: 16px;
-                    text-align: justify;
-                }
-
-                .about-description p:last-child {
-                    margin-bottom: 0;
+                    text-align: left !important;
+                    font-size: inherit !important;
+                    line-height: inherit !important;
+                    color: inherit !important;
                 }
 
                 .about-description strong, 
                 .about-description b {
-                    color: #063d59;
-                    font-weight: 700;
+                    color: #063d59 !important;
+                    font-weight: 700 !important;
                 }
 
                 .about-description a {
-                    color: #07567f;
-                    font-weight: 600;
-                    text-decoration: none;
+                    color: #07567f !important;
+                    font-weight: 600 !important;
+                    text-decoration: underline !important;
+                    transition: color 0.2s ease;
+                }
+                .about-description a:hover {
+                    color: #ff6600 !important;
+                }
+
+                .about-description img {
+                    max-width: 100% !important;
+                    height: auto !important;
+                    border-radius: 8px !important;
+                    margin: 10px 0 !important;
                 }
 
                 /* =====================================================
@@ -580,7 +608,7 @@ function WhyChosseUs() {
                 }
 
                 /* =====================================================
-                   RESPONSIVE (LAPTOP, TABLET, MOBILE)
+                   RESPONSIVE
                 ====================================================== */
                 @media (max-width: 1200px) {
                     .why-choose-section { padding: 65px 0; }
@@ -629,8 +657,15 @@ function WhyChosseUs() {
                     .label-text { font-size: 10px; letter-spacing: 1.8px; }
                     .why-choose-title { font-size: 25px; line-height: 1.3; }
                     .heading-decoration { margin: 12px 0 17px; }
-                    .about-description { font-size: 13px; line-height: 1.75; }
-                    .about-description p { margin-bottom: 13px; text-align: left; }
+                    
+                    .about-description { font-size: 14px; line-height: 1.75; }
+                    .about-description p { margin-bottom: 13px !important; text-align: left !important; }
+                    .about-description h1 { font-size: 20px !important; }
+                    .about-description h2 { font-size: 18px !important; }
+                    .about-description h3 { font-size: 16px !important; }
+                    .about-description h4, .about-description h5, .about-description h6 { font-size: 15px !important; }
+                    .about-description ul, .about-description ol { padding-left: 20px !important; }
+
                     .why-choose-footer { margin-top: 20px; }
                     .read-more-btn { font-size: 12px; padding: 8px 16px; }
                 }
@@ -642,7 +677,7 @@ function WhyChosseUs() {
                     .decoration-one { width: 45px; height: 45px; left: -3px; bottom: 2px; }
                     .decoration-two { width: 40px; height: 40px; right: -3px; top: 2px; }
                     .why-choose-title { font-size: 22px; }
-                    .about-description { font-size: 12.5px; line-height: 1.7; }
+                    .about-description { font-size: 13px; line-height: 1.7; }
                     .image-dots { display: none; }
                 }
                 `}

@@ -13,7 +13,7 @@ function Activities() {
 
     const loadPlacementData = async () => {
         try {
-            const placementData = await getWebsiteContentdata(40);
+            const placementData = await getWebsiteContentdata(0);
 
             setPlacements(
                 (placementData || []).filter(

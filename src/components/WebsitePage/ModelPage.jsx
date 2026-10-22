@@ -1,12 +1,13 @@
  import React, { useState, useEffect } from "react";
 import { EnqueryDataSubmit, EnqueryDataFranchiseSubmit } from "./HomeService"; 
 
-// ✅ Props accept karega
 function ModelPage({ isOpen: externalIsOpen, onClose: externalOnClose, initialTab = "student" }) {
 
-    // Agar parent control kar raha hai toh external use karo, warna internal (fallback)
-    const [internalShowModal, setInternalShowModal] = useState(true);
+    // ✅ FIX: Default value false kar di, taaki Home.jsx se control ho sake
+    const [internalShowModal, setInternalShowModal] = useState(false);
+    
     const showModal = externalIsOpen !== undefined ? externalIsOpen : internalShowModal;
+    
     const handleCloseModal = () => {
         if (externalOnClose) externalOnClose();
         else setInternalShowModal(false);
@@ -20,13 +21,22 @@ function ModelPage({ isOpen: externalIsOpen, onClose: externalOnClose, initialTa
         name: "", mobileNo: "", email: "", course: "", instituteName: "", remarks: ""
     });
 
-    // ✅ Jab tab change ho (Student se Franchise ya Franchise se Student)
     useEffect(() => {
         if (showModal) {
             setActiveTab(initialTab);
             setFormData({ name: "", mobileNo: "", email: "", course: "", instituteName: "", remarks: "" });
         }
     }, [initialTab, showModal]);
+
+    // ✅ Body scroll lock jab modal khula ho
+    useEffect(() => {
+        if (showModal) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+        return () => { document.body.style.overflow = "auto"; };
+    }, [showModal]);
 
     const showToast = (message, type = "info") => {
         setToast({ message, type });
@@ -85,9 +95,8 @@ function ModelPage({ isOpen: externalIsOpen, onClose: externalOnClose, initialTa
     return (
         <>
             <style>{`
-                /* Aapki purani saari CSS yahan aayegi */
                 .model-page-overlay { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: flex-start; justify-content: center; padding: 30px 20px 20px; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(5px); animation: modelOverlayShow 0.25s ease; overflow-y: auto; }
-                .model-page-modal { width: 100%; max-width: 650px; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.30); animation: modelModalShow 0.4s ease; border-top: 5px solid #ff6600; }
+                .model-page-modal { width: 100%; max-width: 650px; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.30); animation: modelModalShow 0.4s ease; border-top: 5px solid #ff6600; position: relative; }
                 .model-page-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid #eeeeee; background: #ffffff; }
                 .model-page-title { display: flex; align-items: center; gap: 13px; }
                 .model-page-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #fff1e8; color: #ff6600; font-size: 21px; }
@@ -137,17 +146,20 @@ function ModelPage({ isOpen: externalIsOpen, onClose: externalOnClose, initialTa
                 </div>
             )}
 
-            <div className="model-page-overlay">
-                <div className="model-page-modal">
+            {/* ✅ FIX: Overlay par click karne se modal band hoga */}
+            <div className="model-page-overlay" onClick={handleCloseModal} role="dialog" aria-modal="true">
+                {/* ✅ FIX: Modal ke andar click karne par band nahi hoga (e.stopPropagation) */}
+                <div className="model-page-modal" onClick={(e) => e.stopPropagation()}>
                     <div className="model-page-header">
                         <div className="model-page-title">
                             <div className="model-page-icon">{activeTab === "student" ? "🎓" : "🏢"}</div>
                             <div>
                                 <h3>{activeTab === "student" ? "Student Enquiry" : "Franchise Enquiry"}</h3>
-                                <span>SBSHE</span>
+                                <span>Shaheed Bhagat Singh Health & Education</span>
                             </div>
                         </div>
-                        <button type="button" className="model-page-close" onClick={handleCloseModal} aria-label="Close">×</button>
+                        {/* ✅ FIX: Added aria-label */}
+                        <button type="button" className="model-page-close" onClick={handleCloseModal} aria-label="Close popup">×</button>
                     </div>
 
                     <div className="model-page-tabs">
@@ -159,31 +171,31 @@ function ModelPage({ isOpen: externalIsOpen, onClose: externalOnClose, initialTa
                         <form id="unified-enquiry-form" className="model-page-form" onSubmit={handleSubmit}>
                             {activeTab === "franchise" && (
                                 <div className="model-page-field ">
-                                    <label>Institute Name <span>*</span></label>
-                                    <input type="text" name="instituteName" value={formData.instituteName} onChange={handleChange} placeholder="Enter your institute name" required />
+                                    <label htmlFor="instituteName">Institute Name <span>*</span></label>
+                                    <input type="text" id="instituteName" name="instituteName" value={formData.instituteName} onChange={handleChange} placeholder="Enter your institute name" required />
                                 </div>
                             )}
                             <div className="model-page-field">
-                                <label>Full Name <span>*</span></label>
-                                <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Enter your full name" required />
+                                <label htmlFor="name">Full Name <span>*</span></label>
+                                <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Enter your full name" required />
                             </div>
                             <div className="model-page-field">
-                                <label>Mobile No <span>*</span></label>
-                                <input type="tel" name="mobileNo" value={formData.mobileNo} onChange={(e) => setFormData((prev) => ({ ...prev, mobileNo: e.target.value.replace(/\D/g, "").slice(0, 10) }))} placeholder="10 digit mobile number" maxLength={10} inputMode="numeric" required />
+                                <label htmlFor="mobileNo">Mobile No <span>*</span></label>
+                                <input type="tel" id="mobileNo" name="mobileNo" value={formData.mobileNo} onChange={(e) => setFormData((prev) => ({ ...prev, mobileNo: e.target.value.replace(/\D/g, "").slice(0, 10) }))} placeholder="10 digit mobile number" maxLength={10} inputMode="numeric" required />
                             </div>
                             <div className="model-page-field">
-                                <label>Email</label>
-                                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" />
+                                <label htmlFor="email">Email</label>
+                                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" />
                             </div>
                             {activeTab === "student" && (
                                 <div className="model-page-field">
-                                    <label>Course</label>
-                                    <input type="text" name="course" value={formData.course} onChange={handleChange} placeholder="Enter your course (e.g.)" />
+                                    <label htmlFor="course">Course</label>
+                                    <input type="text" id="course" name="course" value={formData.course} onChange={handleChange} placeholder="Enter your course (e.g.)" />
                                 </div>
                             )}
                             <div className="model-page-field full">
-                                <label>Remarks</label>
-                                <textarea name="remarks" value={formData.remarks} onChange={handleChange} placeholder="Write your message here..." />
+                                <label htmlFor="remarks">Remarks</label>
+                                <textarea id="remarks" name="remarks" value={formData.remarks} onChange={handleChange} placeholder="Write your message here..." />
                             </div>
                         </form>
                     </div>

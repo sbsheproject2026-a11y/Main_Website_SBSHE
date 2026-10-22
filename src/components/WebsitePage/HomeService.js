@@ -1,22 +1,44 @@
 
 import api2 from "../api";
 
-export const getMenu = async (menuId,submenuId) => {
-    const response = await api2.get(
-       // `/website-menu?parent=${menuId}`
-        `/Website/website-menu?id=${menuId}&pid=${submenuId}`
-    );
-
-    return response.data; 
-};
  
-export const getWebsiteContentdata = async (id) => {
-    const response = await api2.get(
-       `/Website/all-website-content/${id}`
-    );
-
-    return response.data;
+// ✅ Helper function for Caching
+const fetchWithCache = async (url, cacheKey) => {
+    const cachedData = localStorage.getItem(cacheKey);
+    try {
+        const response = await api2.get(url);
+        // Naya data aane par cache update karein
+        localStorage.setItem(cacheKey, JSON.stringify(response.data));
+        return response.data;
+    } catch (error) {
+        // Agar API fail ho jaye aur cache mein data ho, toh wahi dikhayein
+        if (cachedData) {
+            console.log("API failed, using cached data for:", cacheKey);
+            return JSON.parse(cachedData);
+        }
+        throw error;
+    }
 };
+
+export const getProgramme = async (id) => {
+    return fetchWithCache(`/Website/website-content/${id}`, `prog_${id}`);
+};
+
+export const getCourses = async (id) => {
+    return fetchWithCache(`/Website/website-course/${id}`, `course_${id}`);
+};
+
+export const getMenu = async (menuId, submenuId) => {
+    return fetchWithCache(
+        `/Website/website-menu?id=${menuId}&pid=${submenuId}`, 
+        `menu_${menuId}_${submenuId}`
+    );
+};
+
+export const getWebsiteContentdata = async (id) => {
+    return fetchWithCache(`/Website/all-website-content/${id}`, `content_${id}`);
+};
+
 
 
 export const EnqueryDataSubmit = async (data) => {
@@ -85,13 +107,3 @@ export const getCheckStatus = async (id) => {
   return response.data;
 };
 
-
-export const getProgramme  = async (id) => {
-  const response = await api2.get(`/Website/website-content/${id}`);
-  return response.data;
-};
- 
-export const getCourses = async (id) => {
-    const response = await api2.get(`/Website/website-course/${id}`);
-    return response.data;
-};

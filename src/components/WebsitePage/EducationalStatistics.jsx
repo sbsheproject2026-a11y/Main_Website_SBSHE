@@ -1,5 +1,5 @@
  import React, { useEffect, useState } from "react";
-import {  getWebsiteContentdata } from "./HomeService";
+import { getWebsiteContentdata } from "./HomeService";
 
 function EducationalStatistics() {
     const [totalcounts, setTotalcounts] = useState([]);
@@ -77,7 +77,7 @@ function EducationalStatistics() {
     return (
         <>
             <section className="count-section">
-                <div className=" ">
+                <div className="">
                     <div className="row justify-content-center">
                         {totalcounts.map((item, index) => {
                             const colorIndex = (index % 4) + 1;
@@ -195,8 +195,8 @@ function EducationalStatistics() {
 
                 .count-card {
                     position: relative;
-                    min-height: 180px;
-                    padding: 52px 25px 25px;
+                    min-height: 190px; /* Thoda height badhaya hai taaki space mile */
+                    padding: 70px 25px 25px; /* ✅ Top padding 52px se 70px kiya hai taaki icon aur text ke beech gap aaye */
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -231,11 +231,12 @@ function EducationalStatistics() {
                     border-right: none;
                 }
 
+                /* ✅ Arrow alignment ko center kiya gaya hai */
                 .count-card::after {
                     content: "";
                     position: absolute;
                     right: -29px;
-                    top: 50%;
+                    top: 55%; /* 50% se 55% kiya hai taaki icon ke overlap ke baad perfect center lage */
                     transform: translateY(-50%);
                     width: 0;
                     height: 0;
@@ -257,6 +258,7 @@ function EducationalStatistics() {
                     display: none;
                 }
 
+                /* ✅ Icon perfectly center aur clean kiya gaya hai */
                 .count-icon {
                     position: absolute;
                     top: -39px;
@@ -271,16 +273,16 @@ function EducationalStatistics() {
                     border-radius: 50%;
                     background: #fff;
                     color: #273b66;
-                    border: 8px solid #ffb400;
+                    border: 6px solid #ffb400; /* Border 8px se 6px kiya hai (Sleek look) */
                     font-size: 28px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Shadow thodi soft ki hai */
                     z-index: 10;
                     transition: none !important;
                 }
 
                 .count-card:hover .count-icon {
                     transform: translateX(-50%) !important;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
                 }
 
                 .count-icon i {
@@ -294,30 +296,31 @@ function EducationalStatistics() {
                     position: relative;
                     z-index: 5;
                     width: 100%;
-                    padding-top: 8px;
                     text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px; /* Number aur text ke beech gap */
                 }
 
                 .count-short-name {
                     color: #fff;
-                    font-size: 28px;
+                    font-size: 32px; /* Text ko thoda bada kiya hai */
                     font-weight: 800;
-                    line-height: 1.2;
+                    line-height: 1.1;
                     text-align: center;
-                    margin-bottom: 7px;
                     text-transform: uppercase;
-                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
                 }
 
                 .count-content h2 {
                     margin: 0;
                     color: #fff;
-                    font-size: 15px;
+                    font-size: 14px;
                     font-weight: 600;
                     line-height: 1.5;
                     text-align: center;
                     text-transform: uppercase;
-                    letter-spacing: 0.5px;
+                    letter-spacing: 0.8px;
                     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
                 }
 
@@ -363,17 +366,16 @@ function EducationalStatistics() {
                     }
 
                     .count-card {
-                        min-height: 175px;
-                        padding-left: 20px;
-                        padding-right: 20px;
+                        min-height: 180px;
+                        padding: 65px 20px 20px; /* Tablets ke liye adjust kiya */
                     }
 
                     .count-short-name {
-                        font-size: 24px;
+                        font-size: 26px;
                     }
 
                     .count-content h2 {
-                        font-size: 14px;
+                        font-size: 13px;
                     }
 
                     .count-icon {
@@ -404,8 +406,8 @@ function EducationalStatistics() {
                     }
 
                     .count-card {
-                        min-height: 155px;
-                        padding: 45px 20px 25px;
+                        min-height: 160px;
+                        padding: 55px 20px 20px; /* Mobile me space fix */
                         border-radius: 8px;
                         border-right: none;
                     }
@@ -419,7 +421,7 @@ function EducationalStatistics() {
                         height: 68px;
                         min-width: 68px;
                         top: -34px;
-                        border-width: 7px;
+                        border-width: 5px;
                     }
 
                     .count-icon i {
@@ -427,13 +429,12 @@ function EducationalStatistics() {
                     }
 
                     .count-short-name {
-                        font-size: 22px;
-                        margin-bottom: 6px;
+                        font-size: 24px;
                     }
 
                     .count-content h2 {
-                        font-size: 13px;
-                        line-height: 1.5;
+                        font-size: 12px;
+                        line-height: 1.4;
                     }
 
                     .count-number {
@@ -451,8 +452,8 @@ function EducationalStatistics() {
                     }
 
                     .count-card {
-                        min-height: 145px;
-                        padding: 42px 15px 20px;
+                        min-height: 150px;
+                        padding: 50px 15px 15px;
                     }
 
                     .count-icon {
@@ -460,7 +461,7 @@ function EducationalStatistics() {
                         height: 62px;
                         min-width: 62px;
                         top: -31px;
-                        border-width: 6px;
+                        border-width: 5px;
                     }
 
                     .count-icon i {
@@ -468,11 +469,11 @@ function EducationalStatistics() {
                     }
 
                     .count-short-name {
-                        font-size: 20px;
+                        font-size: 22px;
                     }
 
                     .count-content h2 {
-                        font-size: 12px;
+                        font-size: 11px;
                     }
 
                     .count-number {

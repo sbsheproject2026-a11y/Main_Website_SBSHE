@@ -1,0 +1,1 @@
+import{n as e}from"./api-C6mtWg-S.js";var t=async t=>(await e.get(`https://api.shaheedbhagatsinghhealthandeducation.com/api/DocumentProfile/admin-authority-letter-print/${t}`)).data,n=async t=>(await e.get(`https://api.shaheedbhagatsinghhealthandeducation.com/api/Website/frenchise-list/${t}`)).data;export{t as n,n as t};

@@ -5,7 +5,7 @@ import { FILE_URL } from "../api";
 function Testimonial() {
     const [testimonials, setTestimonials] = useState([]);
     const [activeTestimonial, setActiveTestimonial] = useState(0);
-    const [isJumping, setIsJumping] = useState(false); // ✅ Naya state transition rokne ke liye
+    const [isJumping, setIsJumping] = useState(false);
 
     useEffect(() => {
         loadPageData();
@@ -27,12 +27,21 @@ function Testimonial() {
             (testimonialdata || []).forEach(item => {
                 if (item.isActive === 1 && item.productCategoryDocuments) {
                     item.productCategoryDocuments.forEach(doc => {
+                        // ✅ Image Proxy & Optimization
+                        const rawPath = doc.fileupload || "";
+                        const fullUrl = rawPath 
+                            ? (rawPath.startsWith('http') ? rawPath : `${FILE_URL}${rawPath.startsWith('/') ? '' : '/'}${rawPath}`) 
+                            : "";
+                        const optimizedImage = fullUrl 
+                            ? `https://wsrv.nl/?url=${encodeURIComponent(fullUrl)}&w=150&output=webp&q=80` 
+                            : "";
+
                         flatData.push({
                             id: doc.id,
                             name: doc.name || "Student",
                             role: item.name || "Student",
                             review: stripHtml(item.descrption),
-                            image: doc.fileupload ? `${FILE_URL}${doc.fileupload}` : "",
+                            image: optimizedImage, // ✅ Using optimized image
                         });
                     });
                 }
@@ -71,14 +80,9 @@ function Testimonial() {
             displayTestimonials.length > 1 &&
             activeTestimonial === displayTestimonials.length
         ) {
-            // 650ms wait karo (jab tak 3rd slide se clone tak ka animation pura ho)
             const timer = setTimeout(() => {
-                // 1. Transition ko band karo
                 setIsJumping(true);
-                // 2. Wapis 0 par le jao
                 setActiveTestimonial(0);
-                
-                // 3. Thodi der baad transition wapis on kar do
                 setTimeout(() => {
                     setIsJumping(false);
                 }, 50);
@@ -93,18 +97,15 @@ function Testimonial() {
             ? 0
             : activeTestimonial;
 
-    // ✅ Previous Button Logic Fix
     const handlePrevious = () => {
         if (isJumping) return;
 
         if (activeTestimonial === 0) {
-            // Agar first slide par hain, toh instantly last slide (clone) par jao
             setIsJumping(true);
             setActiveTestimonial(displayTestimonials.length);
             
             setTimeout(() => {
                 setIsJumping(false);
-                // Fir smoothly original last slide par aao
                 setActiveTestimonial(displayTestimonials.length - 1);
             }, 50);
         } else {
@@ -112,7 +113,6 @@ function Testimonial() {
         }
     };
 
-    // ✅ Next Button Logic Fix
     const handleNext = () => {
         if (isJumping || activeTestimonial === displayTestimonials.length) return;
         setActiveTestimonial(prev => prev + 1);
@@ -138,7 +138,6 @@ function Testimonial() {
 
                     <div className="testimonial-slider">
                         <div className="testimonial-overflow">
-                            {/* ✅ isJumping ke basis par class change hogi */}
                             <div
                                 className={`testimonial-track ${
                                     isJumping ? "testimonial-reset" : ""
@@ -165,19 +164,22 @@ function Testimonial() {
                                                                         src={item.image}
                                                                         alt={item.name || "Student"}
                                                                         className="testimonial-image"
+                                                                        width="102"
+                                                                        height="102"
+                                                                        loading="lazy"
                                                                         onError={(e) => {
                                                                             e.currentTarget.src = "https://via.placeholder.com/100?text=User";
                                                                         }}
                                                                     />
                                                                 ) : (
                                                                     <div className="testimonial-placeholder">
-                                                                        <i className="fa fa-user"></i>
+                                                                        <i className="fa fa-user" aria-hidden="true"></i>
                                                                     </div>
                                                                 )}
                                                             </div>
 
                                                             <div className="verified-badge">
-                                                                <i className="fa fa-check"></i>
+                                                                <i className="fa fa-check" aria-hidden="true"></i>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -193,18 +195,18 @@ function Testimonial() {
                                                             </div>
 
                                                             <div className="testimonial-stars">
-                                                                <i className="fa fa-star"></i>
-                                                                <i className="fa fa-star"></i>
-                                                                <i className="fa fa-star"></i>
-                                                                <i className="fa fa-star"></i>
-                                                                <i className="fa fa-star"></i>
+                                                                <i className="fa fa-star" aria-hidden="true"></i>
+                                                                <i className="fa fa-star" aria-hidden="true"></i>
+                                                                <i className="fa fa-star" aria-hidden="true"></i>
+                                                                <i className="fa fa-star" aria-hidden="true"></i>
+                                                                <i className="fa fa-star" aria-hidden="true"></i>
                                                             </div>
                                                         </div>
 
                                                         {/* DESCRIPTION */}
                                                         <div className="testimonial-review">
                                                             <div className="quote-icon">
-                                                                <i className="fa fa-quote-left"></i>
+                                                                <i className="fa fa-quote-left" aria-hidden="true"></i>
                                                             </div>
 
                                                             <p>{item.review}</p>
@@ -227,8 +229,9 @@ function Testimonial() {
                                     className="testimonial-arrow"
                                     onClick={handlePrevious}
                                     disabled={isJumping}
+                                    aria-label="Previous testimonial"
                                 >
-                                    <i className="fa fa-arrow-left"></i>
+                                    <i className="fa fa-arrow-left" aria-hidden="true"></i>
                                 </button>
 
                                 <div className="testimonial-dots">
@@ -242,6 +245,7 @@ function Testimonial() {
                                             onClick={() => {
                                                 if(!isJumping) setActiveTestimonial(index);
                                             }}
+                                            aria-label={`Go to testimonial ${index + 1}`}
                                         />
                                     ))}
                                 </div>
@@ -251,8 +255,9 @@ function Testimonial() {
                                     className="testimonial-arrow"
                                     onClick={handleNext}
                                     disabled={isJumping}
+                                    aria-label="Next testimonial"
                                 >
-                                    <i className="fa fa-arrow-right"></i>
+                                    <i className="fa fa-arrow-right" aria-hidden="true"></i>
                                 </button>
                             </div>
                         )}
@@ -262,499 +267,45 @@ function Testimonial() {
 
             <style>
                 {`
-                /* =====================================================
-                   TESTIMONIAL — LEFT IMAGE + RIGHT CONTENT
-                ===================================================== */
-
-                .testimonial-section {
-                    position: relative;
-                    padding: 45px 0 35px;
-                    background:
-                        radial-gradient(circle at 10% 20%, rgba(255,102,0,0.06), transparent 30%),
-                        radial-gradient(circle at 90% 80%, rgba(255,102,0,0.05), transparent 30%),
-                        #f8f9fc;
-                    overflow: hidden;
-                }
-
-                /* HEADING */
-                .testimonial-heading {
-                    position: relative;
-                    z-index: 2;
-                }
-
-                .testimonial-label {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    gap: 10px;
-                    color: #01507c;
-                    font-size: 11px;
-                    font-weight: 800;
-                    letter-spacing: 3px;
-                    margin-bottom: 6px;
-                }
-
-                .testimonial-label span {
-                    width: 26px;
-                    height: 2px;
-                    background: #01507c;
-                    display: inline-block;
-                    border-radius: 5px;
-                }
-
-                .testimonial-heading h1 {
-                    margin: 0;
-                    color: #20242a;
-                    font-size: 26px;
-                    font-weight: 800;
-                    letter-spacing: -0.5px;
-                }
-
-                /* SLIDER */
-                .testimonial-slider {
-                    position: relative;
-                    z-index: 2;
-                    max-width: 950px;
-                    margin: auto;
-                }
-
-                .testimonial-overflow {
-                    overflow: hidden;
-                    padding: 10px 8px 15px;
-                }
-
-                .testimonial-track {
-                    display: flex;
-                    width: 100%;
-                    transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
-                    will-change: transform;
-                }
-
-                /* ✅ Sirf tab lagta hai jab jump karna ho */
-                .testimonial-reset {
-                    transition: none !important;
-                }
-
-                .testimonial-slide {
-                    min-width: 100%;
-                    width: 100%;
-                    flex: 0 0 100%;
-                }
-
-                /* =====================================================
-                   CARD — HORIZONTAL LAYOUT
-                ===================================================== */
-
-                .testimonial-card {
-                    position: relative;
-                    background: #ffffff;
-                    border-radius: 18px;
-                    padding: 24px 30px;
-                    border: 1px solid #edf0f5;
-                    box-shadow: 0 10px 30px rgba(20, 30, 50, 0.07);
-                    overflow: hidden;
-
-                    display: flex;
-                    align-items: center;
-                    gap: 25px;
-
-                    transition: all 0.3s ease;
-                }
-
-                .testimonial-card:hover {
-                    box-shadow: 0 15px 40px rgba(255,102,0,0.12);
-                }
-
-                .testimonial-card::before {
-                    content: "";
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 4px;
-                    background: linear-gradient(90deg, #01507c, #ff8c42);
-                }
-
-                /* =====================================================
-                   LEFT — IMAGE
-                ===================================================== */
-
-                .testimonial-left {
-                    flex-shrink: 0;
-                }
-
-                .testimonial-image-wrapper {
-                    position: relative;
-                    width: 110px;
-                    height: 110px;
-                }
-
-                .testimonial-image-ring {
-                    width: 110px;
-                    height: 110px;
-                    padding: 4px;
-                    border-radius: 50%;
-                    background: linear-gradient(135deg, #01507c, #ffb37a, #01507c);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .testimonial-image {
-                    width: 102px;
-                    height: 102px;
-                    object-fit: cover;
-                    border-radius: 50%;
-                    border: 4px solid #fff;
-                    display: block;
-                }
-
-                .testimonial-placeholder {
-                    width: 102px;
-                    height: 102px;
-                    border-radius: 50%;
-                    background: #fff;
-                    color: #01507c;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 38px;
-                }
-
-                .verified-badge {
-                    position: absolute;
-                    right: 0px;
-                    bottom: 4px;
-                    width: 26px;
-                    height: 26px;
-                    border-radius: 50%;
-                    background: #28a745;
-                    color: white;
-                    border: 3px solid white;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 10px;
-                }
-
-                /* =====================================================
-                   RIGHT — NAME + STARS + DESCRIPTION
-                ===================================================== */
-
-                .testimonial-right {
-                    flex: 1;
-                    min-width: 0;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                }
-
-                /* TOP ROW — Name + Stars */
-                .testimonial-head {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 14px;
-                    padding-bottom: 10px;
-                    border-bottom: 1px solid #eef1f5;
-                }
-
-                .testimonial-head-info h3 {
-                    margin: 0 0 3px;
-                    color: #1c2430;
-                    font-size: 18px;
-                    font-weight: 800;
-                    line-height: 1.2;
-                }
-
-                .testimonial-head-info p {
-                    margin: 0;
-                    color: #7a8794;
-                    font-size: 12px;
-                    font-weight: 600;
-                    letter-spacing: 0.3px;
-                    text-transform: uppercase;
-                }
-
-                .testimonial-stars {
-                    display: flex;
-                    gap: 3px;
-                    flex-shrink: 0;
-                }
-
-                .testimonial-stars i {
-                    color: #ffb400;
-                    font-size: 14px;
-                }
-
-                /* DESCRIPTION */
-                .testimonial-review {
-                    position: relative;
-                    padding-left: 26px;
-                }
-
-                .testimonial-review p {
-                    margin: 0;
-                    color: #4b5563;
-                    font-size: 14px;
-                    line-height: 1.75;
-                    font-weight: 400;
-                    font-style: italic;
-                }
-
-                .quote-icon {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    color: #01507c;
-                    font-size: 18px;
-                    opacity: 0.85;
-                }
-
-                /* =====================================================
-                   CONTROLS
-                ===================================================== */
-
-                .testimonial-controls {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 14px;
-                    margin-top: 10px;
-                }
-
-                .testimonial-arrow {
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 50%;
-                    border: 1px solid #e4e7ec;
-                    background: #fff;
-                    color: #01507c;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-                    font-size: 12px;
-                }
-
-                .testimonial-arrow:hover:not(:disabled) {
-                    background: #01507c;
-                    color: #fff;
-                    border-color: #01507c;
-                    transform: translateY(-2px);
-                }
-                
-                .testimonial-arrow:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
-
-                .testimonial-dots {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                }
-
-                .testimonial-dot {
-                    width: 8px;
-                    height: 8px;
-                    padding: 0;
-                    border: none;
-                    border-radius: 50%;
-                    background: #d7dbe1;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                }
-
-                .testimonial-dot.active {
-                    width: 24px;
-                    border-radius: 10px;
-                    background: #01507c;
-                }
-
-                /* =====================================================
-                   RESPONSIVE
-                ===================================================== */
-
-                @media (max-width: 991px) {
-                    .testimonial-heading h1 {
-                        font-size: 22px;
-                    }
-
-                    .testimonial-card {
-                        padding: 22px 24px;
-                        gap: 20px;
-                    }
-
-                    .testimonial-image-wrapper,
-                    .testimonial-image-ring {
-                        width: 95px;
-                        height: 95px;
-                    }
-
-                    .testimonial-image,
-                    .testimonial-placeholder {
-                        width: 87px;
-                        height: 87px;
-                    }
-
-                    .testimonial-placeholder {
-                        font-size: 32px;
-                    }
-
-                    .testimonial-head-info h3 {
-                        font-size: 16px;
-                    }
-
-                    .testimonial-review p {
-                        font-size: 13px;
-                    }
-                }
-
-                @media (max-width: 767px) {
-                    .testimonial-section {
-                        padding: 30px 0 25px;
-                    }
-
-                    .testimonial-heading h1 {
-                        font-size: 20px;
-                    }
-
-                    .testimonial-card {
-                        padding: 18px 18px;
-                        gap: 15px;
-                        border-radius: 14px;
-                    }
-
-                    .testimonial-image-wrapper,
-                    .testimonial-image-ring {
-                        width: 80px;
-                        height: 80px;
-                    }
-
-                    .testimonial-image,
-                    .testimonial-placeholder {
-                        width: 72px;
-                        height: 72px;
-                    }
-
-                    .testimonial-placeholder {
-                        font-size: 26px;
-                    }
-
-                    .verified-badge {
-                        width: 22px;
-                        height: 22px;
-                        font-size: 9px;
-                    }
-
-                    .testimonial-head {
-                        flex-direction: column;
-                        align-items: flex-start;
-                        gap: 6px;
-                    }
-
-                    .testimonial-head-info h3 {
-                        font-size: 15px;
-                    }
-
-                    .testimonial-head-info p {
-                        font-size: 11px;
-                    }
-
-                    .testimonial-stars i {
-                        font-size: 12px;
-                    }
-
-                    .testimonial-review {
-                        padding-left: 22px;
-                    }
-
-                    .testimonial-review p {
-                        font-size: 12.5px;
-                        line-height: 1.65;
-                    }
-
-                    .quote-icon {
-                        font-size: 15px;
-                    }
-                }
-
-                @media (max-width: 480px) {
-                    .testimonial-heading h1 {
-                        font-size: 17px;
-                    }
-
-                    .testimonial-label {
-                        font-size: 9.5px;
-                        letter-spacing: 2px;
-                    }
-
-                    .testimonial-card {
-                        padding: 14px 14px;
-                        gap: 12px;
-                        flex-direction: column;
-                        text-align: center;
-                    }
-
-                    .testimonial-left {
-                        display: flex;
-                        justify-content: center;
-                    }
-
-                    .testimonial-image-wrapper,
-                    .testimonial-image-ring {
-                        width: 75px;
-                        height: 75px;
-                    }
-
-                    .testimonial-image,
-                    .testimonial-placeholder {
-                        width: 67px;
-                        height: 67px;
-                    }
-
-                    .testimonial-placeholder {
-                        font-size: 22px;
-                    }
-
-                    .testimonial-head {
-                        align-items: center;
-                        text-align: center;
-                    }
-
-                    .testimonial-head-info {
-                        text-align: center;
-                        width: 100%;
-                    }
-
-                    .testimonial-stars {
-                        justify-content: center;
-                    }
-
-                    .testimonial-review {
-                        padding: 0 16px;
-                        text-align: center;
-                    }
-
-                    .testimonial-review p {
-                        font-size: 12px;
-                    }
-
-                    .quote-icon {
-                        left: 0;
-                        top: -2px;
-                        font-size: 14px;
-                    }
-
-                    .testimonial-arrow {
-                        width: 32px;
-                        height: 32px;
-                        font-size: 11px;
-                    }
-                }
+                /* Aapka original CSS yahan aayega, maine isme koi change nahi kiya hai */
+                .testimonial-section { position: relative; padding: 45px 0 35px; background: radial-gradient(circle at 10% 20%, rgba(255,102,0,0.06), transparent 30%), radial-gradient(circle at 90% 80%, rgba(255,102,0,0.05), transparent 30%), #f8f9fc; overflow: hidden; }
+                .testimonial-heading { position: relative; z-index: 2; }
+                .testimonial-label { display: flex; justify-content: center; align-items: center; gap: 10px; color: #01507c; font-size: 11px; font-weight: 800; letter-spacing: 3px; margin-bottom: 6px; }
+                .testimonial-label span { width: 26px; height: 2px; background: #01507c; display: inline-block; border-radius: 5px; }
+                .testimonial-heading h1 { margin: 0; color: #20242a; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+                .testimonial-slider { position: relative; z-index: 2; max-width: 950px; margin: auto; }
+                .testimonial-overflow { overflow: hidden; padding: 10px 8px 15px; }
+                .testimonial-track { display: flex; width: 100%; transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+                .testimonial-reset { transition: none !important; }
+                .testimonial-slide { min-width: 100%; width: 100%; flex: 0 0 100%; }
+                .testimonial-card { position: relative; background: #ffffff; border-radius: 18px; padding: 24px 30px; border: 1px solid #edf0f5; box-shadow: 0 10px 30px rgba(20, 30, 50, 0.07); overflow: hidden; display: flex; align-items: center; gap: 25px; transition: all 0.3s ease; }
+                .testimonial-card:hover { box-shadow: 0 15px 40px rgba(255,102,0,0.12); }
+                .testimonial-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #01507c, #ff8c42); }
+                .testimonial-left { flex-shrink: 0; }
+                .testimonial-image-wrapper { position: relative; width: 110px; height: 110px; }
+                .testimonial-image-ring { width: 110px; height: 110px; padding: 4px; border-radius: 50%; background: linear-gradient(135deg, #01507c, #ffb37a, #01507c); display: flex; align-items: center; justify-content: center; }
+                .testimonial-image { width: 102px; height: 102px; object-fit: cover; border-radius: 50%; border: 4px solid #fff; display: block; }
+                .testimonial-placeholder { width: 102px; height: 102px; border-radius: 50%; background: #fff; color: #01507c; display: flex; align-items: center; justify-content: center; font-size: 38px; }
+                .verified-badge { position: absolute; right: 0px; bottom: 4px; width: 26px; height: 26px; border-radius: 50%; background: #28a745; color: white; border: 3px solid white; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+                .testimonial-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+                .testimonial-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 10px; border-bottom: 1px solid #eef1f5; }
+                .testimonial-head-info h3 { margin: 0 0 3px; color: #1c2430; font-size: 18px; font-weight: 800; line-height: 1.2; }
+                .testimonial-head-info p { margin: 0; color: #7a8794; font-size: 12px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
+                .testimonial-stars { display: flex; gap: 3px; flex-shrink: 0; }
+                .testimonial-stars i { color: #ffb400; font-size: 14px; }
+                .testimonial-review { position: relative; padding-left: 26px; }
+                .testimonial-review p { margin: 0; color: #4b5563; font-size: 14px; line-height: 1.75; font-weight: 400; font-style: italic; }
+                .quote-icon { position: absolute; left: 0; top: 0; color: #01507c; font-size: 18px; opacity: 0.85; }
+                .testimonial-controls { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 10px; }
+                .testimonial-arrow { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #e4e7ec; background: #fff; color: #01507c; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-size: 12px; }
+                .testimonial-arrow:hover:not(:disabled) { background: #01507c; color: #fff; border-color: #01507c; transform: translateY(-2px); }
+                .testimonial-arrow:disabled { opacity: 0.5; cursor: not-allowed; }
+                .testimonial-dots { display: flex; align-items: center; gap: 6px; }
+                .testimonial-dot { width: 8px; height: 8px; padding: 0; border: none; border-radius: 50%; background: #d7dbe1; cursor: pointer; transition: all 0.3s ease; }
+                .testimonial-dot.active { width: 24px; border-radius: 10px; background: #01507c; }
+                @media (max-width: 991px) { .testimonial-heading h1 { font-size: 22px; } .testimonial-card { padding: 22px 24px; gap: 20px; } .testimonial-image-wrapper, .testimonial-image-ring { width: 95px; height: 95px; } .testimonial-image, .testimonial-placeholder { width: 87px; height: 87px; } .testimonial-placeholder { font-size: 32px; } .testimonial-head-info h3 { font-size: 16px; } .testimonial-review p { font-size: 13px; } }
+                @media (max-width: 767px) { .testimonial-section { padding: 30px 0 25px; } .testimonial-heading h1 { font-size: 20px; } .testimonial-card { padding: 18px 18px; gap: 15px; border-radius: 14px; } .testimonial-image-wrapper, .testimonial-image-ring { width: 80px; height: 80px; } .testimonial-image, .testimonial-placeholder { width: 72px; height: 72px; } .testimonial-placeholder { font-size: 26px; } .verified-badge { width: 22px; height: 22px; font-size: 9px; } .testimonial-head { flex-direction: column; align-items: flex-start; gap: 6px; } .testimonial-head-info h3 { font-size: 15px; } .testimonial-head-info p { font-size: 11px; } .testimonial-stars i { font-size: 12px; } .testimonial-review { padding-left: 22px; } .testimonial-review p { font-size: 12.5px; line-height: 1.65; } .quote-icon { font-size: 15px; } }
+                @media (max-width: 480px) { .testimonial-heading h1 { font-size: 17px; } .testimonial-label { font-size: 9.5px; letter-spacing: 2px; } .testimonial-card { padding: 14px 14px; gap: 12px; flex-direction: column; text-align: center; } .testimonial-left { display: flex; justify-content: center; } .testimonial-image-wrapper, .testimonial-image-ring { width: 75px; height: 75px; } .testimonial-image, .testimonial-placeholder { width: 67px; height: 67px; } .testimonial-placeholder { font-size: 22px; } .testimonial-head { align-items: center; text-align: center; } .testimonial-head-info { text-align: center; width: 100%; } .testimonial-stars { justify-content: center; } .testimonial-review { padding: 0 16px; text-align: center; } .testimonial-review p { font-size: 12px; } .quote-icon { left: 0; top: -2px; font-size: 14px; } .testimonial-arrow { width: 32px; height: 32px; font-size: 11px; } }
                 `}
             </style>
         </>

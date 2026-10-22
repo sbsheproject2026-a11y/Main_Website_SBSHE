@@ -27,7 +27,7 @@ const Gallery = () => {
 
             setLoading(true);
 
-            const data = await getWebsiteContentdata(22);
+            const data = await getWebsiteContentdata(0);
 
             const activeData = (data || []).filter(
                 (item) => item.is_active === true
@@ -1019,7 +1019,7 @@ const Gallery = () => {
                                             src={image}
                                             alt={
                                                 item.name ||
-                                                "SBSHE Gallery"
+                                                "Gallery"
                                             }
                                         />
 
@@ -1043,7 +1043,7 @@ const Gallery = () => {
                                                 <h5>
 
                                                     {item.name ||
-                                                        "SBSHE Campus"}
+                                                        " Campus"}
 
                                                 </h5>
 
@@ -1120,7 +1120,7 @@ const Gallery = () => {
                             src={getImage(activeImage)}
                             alt={
                                 activeImage.name ||
-                                "SBSHE Gallery"
+                                "Gallery"
                             }
                         />
 
