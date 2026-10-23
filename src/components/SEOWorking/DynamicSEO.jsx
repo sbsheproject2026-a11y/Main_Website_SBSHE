@@ -6,24 +6,26 @@ const DynamicSEO = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   
-  // 1. Check if we have state passed from Header (for dynamic pages)
   const stateTitle = location.state?.pageTitle;
-
-  // 2. Check central config (for static pages)
   const configData = seoConfig[currentPath];
 
-  // Determine Title
-  let title = "Shaheed Bhagat Singh Health & Education"; // Default
-  let description = "An autonomous Institute established under act 1882.";
+  // ✅ Default values
+  let title = "Shaheed Bhagat Singh Health & Education"; 
+  let description = "An autonomous Institute established under act 1882. Explore 10+ career-focused courses with 100% placement support.";
   
-  if (stateTitle) {
-    title = `${stateTitle} | Shaheed Bhagat Singh Health & Education`;
-  } else if (configData) {
-    title = configData.title;
-    description = configData.description;
-  } else if (currentPath.includes("/about/") || currentPath.includes("/department/")) {
-     // Fallback for dynamic paths if state is lost (e.g. page refresh)
-     title = "Information | Shaheed Bhagat Singh Health & Education";
+  // ✅ FIX: Agar Home page (/) hai toh hamesha Default Title rakho (": Home" nahi aayega)
+  if (currentPath === "/" || currentPath === "") {
+      title = "Shaheed Bhagat Singh Health & Education";
+  } 
+  else if (stateTitle) {
+      title = `${stateTitle} | Shaheed Bhagat Singh Health & Education`;
+  } 
+  else if (configData) {
+      title = configData.title;
+      description = configData.description || description;
+  } 
+  else if (currentPath.includes("/about/") || currentPath.includes("/department/")) {
+      title = "Information | Shaheed Bhagat Singh Health & Education";
   }
 
   return (
@@ -35,5 +37,4 @@ const DynamicSEO = () => {
   );
 };
 
-// ✅ YEH LINE MISSING THI - Ab add kar dein
 export default DynamicSEO;

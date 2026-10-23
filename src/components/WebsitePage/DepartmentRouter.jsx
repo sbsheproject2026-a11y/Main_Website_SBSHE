@@ -1,7 +1,8 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import Career from "./Career";
+ 
 import RTIForm from "../WebsiteForms/RTIForm";
+import Department from "./Department";
 
 function DepartmentRouter() {
   const { slug } = useParams();
@@ -12,7 +13,7 @@ function DepartmentRouter() {
   }
 
   // ✅ Warna Career
-  return <Career />;
+  return <Department />;
 }
 
 export default DepartmentRouter;

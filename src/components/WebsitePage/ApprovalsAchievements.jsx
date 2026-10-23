@@ -327,7 +327,7 @@ function ApprovalsAchievements() {
                         >
                             {selectedFile ? (
                                 fileType === "image" ? (
-                                    <img src={selectedFile} alt={selectedTitle || "Approval Document"} className="approvals-modal-image" />
+                                    <img src={selectedFile} alt={selectedTitle || "Approval Document"} className="approvals-modal-image" loading="lazy" />
                                 ) : fileType === "pdf" ? (
                                     <iframe
                                         src={`${selectedFile}#toolbar=0&navpanes=0&scrollbar=0`}

@@ -1,5 +1,5 @@
  import React, { useEffect, useState } from "react";
- 
+
 import { useLocation } from "react-router-dom";
 import { getCourses } from "./HomeService";
 
@@ -55,21 +55,14 @@ function OnlineCourseDeails() {
         }
     };
 
-    // ✅ Apply Now — studyModeId URL mein bhejo
-//   const handleApplyNow = (studyModeId, courseId) => {
-//     if (!studyModeId) {
-//         window.location.href = APPLY_URL;
-//         return;
-//     }
-//     window.location.href = `${APPLY_URL}?studyModeId=${studyModeId}&Courseid=${courseId}`;
-// };
-  const handleApplyNow = (studyModeId, courseId) => {
-    if (!studyModeId) {
-        window.location.href = APPLY_URL;
-        return;
-    }
-    window.location.href = `${APPLY_URL}`;
-};
+    // ✅ Apply Now
+    const handleApplyNow = (studyModeId, courseId) => {
+        if (!studyModeId) {
+            window.location.href = APPLY_URL;
+            return;
+        }
+        window.location.href = `${APPLY_URL}`;
+    };
 
     const filteredCourses = data.filter((course) => {
         const searchText = search.toLowerCase().trim();
@@ -122,13 +115,11 @@ function OnlineCourseDeails() {
                     <div className="text-center mb-5">
                         <div className="course-label">
                             <span></span>
-                           Online COURSES
+                            Online COURSES
                             <span></span>
                         </div>
 
                         <h1 className="course-heading">Online Course Details</h1>
-
-                         
                     </div>
 
                     <div className="course-controls mb-4">
@@ -225,14 +216,27 @@ function OnlineCourseDeails() {
                                                     )}
                                                 </td>
 
-                                                {/* COURSE FEE */}
+                                                {/* ✅ COURSE FEE — sirf amountTypeId === 113 */}
                                                 <td>
-                                                    {course.productAmounts &&
-                                                        course.productAmounts.length > 0 ? (
-                                                        <div className="fee-list">
-                                                            {course.productAmounts
-                                                                .filter((p) => p.isActive !== 0)
-                                                                .map((p, i) => (
+                                                    {(() => {
+                                                        const feeAmounts = (
+                                                            course.productAmounts || []
+                                                        ).filter(
+                                                            (p) =>
+                                                                Number(p.amountTypeId) === 113
+                                                        );
+
+                                                        if (feeAmounts.length === 0) {
+                                                            return (
+                                                                <span className="fee-empty">
+                                                                    —
+                                                                </span>
+                                                            );
+                                                        }
+
+                                                        return (
+                                                            <div className="fee-list">
+                                                                {feeAmounts.map((p, i) => (
                                                                     <div
                                                                         key={p.id ?? i}
                                                                         className="fee-card"
@@ -241,7 +245,6 @@ function OnlineCourseDeails() {
                                                                             <i className="fa fa-inr"></i>
                                                                         </div>
                                                                         <div className="fee-info">
-
                                                                             <div className="fee-amount-row">
                                                                                 <span className="fee-amount">
                                                                                     ₹
@@ -249,17 +252,16 @@ function OnlineCourseDeails() {
                                                                                         p.amount || 0
                                                                                     ).toLocaleString(
                                                                                         "en-IN"
-                                                                                    )}  + GST
+                                                                                    )}{" "}
+                                                                                    + GST
                                                                                 </span>
-
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 ))}
-                                                        </div>
-                                                    ) : (
-                                                        <span className="fee-empty">—</span>
-                                                    )}
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </td>
 
                                                 {/* APPLY NOW */}
@@ -268,10 +270,12 @@ function OnlineCourseDeails() {
                                                         type="button"
                                                         className="apply-now-btn"
                                                         onClick={() =>
-                                                            handleApplyNow(course.studyModeId, course.id)
+                                                            handleApplyNow(
+                                                                course.studyModeId,
+                                                                course.id
+                                                            )
                                                         }
                                                     >
-                                                      
                                                         <span>Apply Now</span>
                                                     </button>
                                                 </td>
@@ -524,7 +528,6 @@ function OnlineCourseDeails() {
                             white-space: nowrap;
                         }
 
-                        /* ✅ ONLY CHANGE — poora course name dikhe */
                         .course-name {
                             width: 200px;
                             color: #222;
@@ -546,14 +549,13 @@ function OnlineCourseDeails() {
                         }
 
                         /* ============ ELIGIBILITY ============ */
-                       .elig-wrap {
-    display: flex;
-    flex-direction: column;   /* 👈 row ki jagah column */
-    align-items: flex-start;
-    gap: 4px;
-    max-width: 150px;
-}
-    
+                        .elig-wrap {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 4px;
+                            max-width: 150px;
+                        }
 
                         .elig-chip {
                             display: inline-flex;
@@ -576,7 +578,6 @@ function OnlineCourseDeails() {
                             color: #1e88e5;
                         }
 
-                          
                         .elig-empty {
                             color: #cbd5e1;
                             font-size: 13px;

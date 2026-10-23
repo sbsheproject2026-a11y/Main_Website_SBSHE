@@ -999,6 +999,21 @@ function AnnouncementPage() {
                         width: 18px;
                         height: 18px;
                     }
+
+                    /* ✅ FIX: Mobile me View column ko right side par sticky kiya */
+                    .plc-th-view, .plc-td-view {
+                        position: sticky;
+                        right: 0;
+                        background-color: #ffffff;
+                        z-index: 10;
+                        box-shadow: -4px 0 8px rgba(0, 0, 0, 0.05); /* Halki si shadow taaki pata chale sticky hai */
+                    }
+                    .plc-table thead .plc-th-view {
+                        background-color: #f5f8fb;
+                    }
+                    .plc-row:hover .plc-td-view {
+                        background-color: #f8fbfd;
+                    }
                 }
 
                 @media (max-width: 480px) {
@@ -1035,13 +1050,13 @@ function AnnouncementPage() {
                     .plc-name-text { font-size: 12.5px; }
                     .plc-desc-wrap { font-size: 11.5px; }
 
+                    /* ✅ FIX: Button ko chota kiya but text show rakha */
                     .plc-view-btn {
-                        padding: 5px 10px;
-                        font-size: 10.5px;
+                        padding: 6px 10px;
+                        font-size: 11px;
+                        gap: 4px;
                     }
-
-                    .plc-view-btn span { display: none; }
-                    .plc-view-btn i { font-size: 14px; }
+                    .plc-view-btn i { font-size: 12px; }
 
                     .approvals-modal-close {
                         top: 10px;

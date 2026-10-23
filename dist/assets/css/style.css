@@ -63,7 +63,10 @@ body {
   text-align: left;
   background-color: #fff;
 }
-
+body, h1, h2, h3, p, a, span {
+    font-family: 'Poppins', sans-serif;
+    font-display: swap; /* ✅ Text turant dikhega, font baad me load hoga */
+}
 [tabindex="-1"]:focus:not(:focus-visible) {
   outline: 0 !important;
 }

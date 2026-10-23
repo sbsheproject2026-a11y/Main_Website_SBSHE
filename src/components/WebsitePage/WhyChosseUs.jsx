@@ -1,6 +1,7 @@
  import React, { useEffect, useState } from "react";
 import { getWebsiteContentdata } from "./HomeService";
 import { Link } from "react-router-dom";
+import { FILE_URL } from "../api"; // ✅ 1. FILE_URL Import kiya
 
 function WhyChosseUs() {
     const [whyChosseUs, setWhychosseus] = useState([]);
@@ -124,8 +125,15 @@ function WhyChosseUs() {
         <>
             {whyChosseUs.map((item, index) => {
                 const doc = item.productCategoryDocuments?.[0];
-                const fileUrl = doc?.fileupload || "";
-                const isImage = fileUrl && /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(fileUrl);
+                const rawFileUrl = doc?.fileupload || "";
+                
+                // ✅ 2. Full URL Construct kiya
+                const fileUrl = rawFileUrl 
+                    ? (rawFileUrl.startsWith('http') ? rawFileUrl : `${FILE_URL}${rawFileUrl.startsWith('/') ? '' : '/'}${rawFileUrl}`) 
+                    : "";
+
+                // ✅ 3. Image Check thoda strong kiya (query params ke liye)
+                const isImage = fileUrl && /\.(jpeg|jpg|gif|png|webp|svg)(\?.*)?$/i.test(fileUrl);
                 const hasImage = isImage;
                 const readMoreLink = getReadMoreLink(item);
 
@@ -147,7 +155,7 @@ function WhyChosseUs() {
                                             <span className="image-dots image-dots-one"></span>
                                             <span className="image-dots image-dots-two"></span>
 
-                                            {/* ✅ FIX: Added loading="lazy", width & height to prevent CLS */}
+                                            {/* ✅ 4. fileUrl use kiya yahan */}
                                             <img
                                                 src={fileUrl}
                                                 alt={item.name || "Shaheed Bhagat Singh Health and Education"}
@@ -181,7 +189,6 @@ function WhyChosseUs() {
                                             dangerouslySetInnerHTML={{ __html: truncatedHtml }}
                                         />
 
-                                        {/* ✅ FIX: Added aria-label for SEO & Accessibility */}
                                         {isTruncated && (
                                             <Link
                                                 to={readMoreLink}

@@ -4,9 +4,24 @@ import { getWebsiteContentdata } from '../WebsitePage/HomeService';
 
 function Footer() {
     const [contacts, setContacts] = useState([]);
+    
+    // ✅ 1. Scroll button dikhane/chhipane ke liye state
+    const [showBackToTop, setShowBackToTop] = useState(false);
 
     useEffect(() => {
         loadContactData();
+
+        // ✅ 2. Scroll event listener
+        const handleScroll = () => {
+            if (window.scrollY > 300) {
+                setShowBackToTop(true);
+            } else {
+                setShowBackToTop(false);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
     const loadContactData = async () => {
@@ -24,6 +39,14 @@ function Footer() {
         }
     };
 
+    // ✅ 3. Scroll to top function
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    };
+
     return (
         <>
 
@@ -34,7 +57,7 @@ function Footer() {
                         <div className="row">
                             <div className="col-md-7 mb-5">
                                 <h5 className="text-primary text-uppercase mb-4" style={{ letterSpacing: "5px" }}>Get In Touch</h5>
-                                <div style={{ fontSize: "15px" }}
+                                <div style={{ fontSize: "11px" }}
                                     dangerouslySetInnerHTML={{
                                         __html: contacts?.[0]?.descrption || ""
                                     }}
@@ -150,14 +173,28 @@ function Footer() {
                 </div>
             </div>
 
-            {/* ✅ Back to top button mein aria-label add kiya */}
-            <a 
-                href="#top" 
+            {/* ✅ 4. Back to top button updated with React logic & inline CSS */}
+            <button 
+                onClick={scrollToTop}
                 className="btn btn-lg btn-primary btn-lg-square back-to-top" 
                 aria-label="Scroll back to top"
+                style={{
+                    position: 'fixed',
+                    bottom: '30px',
+                    right: '30px',
+                    zIndex: 999,
+                    display: showBackToTop ? 'flex' : 'none', // State ke hisaab se dikhega/chhipega
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '50px',
+                    height: '50px',
+                    border: 'none',
+                    cursor: 'pointer',
+                     
+                }}
             >
-                <i className="fa fa-angle-double-up" aria-hidden="true"></i>
-            </a>
+                <i className="fa fa-angle-double-up" aria-hidden="true" style={{ fontSize: '24px', color: '#fff' }}></i>
+            </button>
 
         </>
     )

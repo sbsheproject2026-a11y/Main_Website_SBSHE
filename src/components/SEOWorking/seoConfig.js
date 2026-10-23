@@ -1,10 +1,10 @@
-// src/seoConfig.js
+ // src/seoConfig.js
 
 export const seoConfig = {
-  // 1. Home Page
+  // 1. Home Page (✅ Updated Title)
   "/": {
-    title: "Home | Shaheed Bhagat Singh Health & Education",
-    description: "Explore 10+ career-focused courses with 100% placement support at Shaheed Bhagat Singh Health & Education. Admissions open for 2025!"
+    title: "Shaheed Bhagat Singh Health & Education",
+    description: "Explore 10+ career-focused courses at Shaheed Bhagat Singh Health & Education. Admissions open! An autonomous institute established under act 1882."
   },
 
   // 2. Approvals / Achievements
@@ -22,13 +22,13 @@ export const seoConfig = {
   // 4. Online Programmes
   "/online-programmes": {
     title: "Online Programmes | Shaheed Bhagat Singh Health & Education",
-    description: "Explore flexible and career-oriented online learning courses offered by SBSHE."
+    description: "Explore flexible and career-oriented online learning courses offered by Shaheed Bhagat Singh Health & Education."
   },
 
   // 5. Accredited Institutes
   "/study-centres": {
     title: "Accredited Institutes | Shaheed Bhagat Singh Health & Education",
-    description: "Find our network of 5000+ partner centers and accredited institutes across India."
+    description: "Find our network partner centers and accredited institutes across India."
   },
 
   // 6. Announcements

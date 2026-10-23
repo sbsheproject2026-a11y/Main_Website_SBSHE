@@ -2,41 +2,27 @@
 
 function FloatingContactButtons({ onEnquiryClick }) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const [showCallMenu, setShowCallMenu] = useState(false);
-  const [showWhatsappMenu, setShowWhatsappMenu] = useState(false);
-  const [showSocialMenu, setShowSocialMenu] = useState(false);
-  const [showAppMenu, setShowAppMenu] = useState(false);
-  const [showEnquiryMenu, setShowEnquiryMenu] = useState(false);
+  // ✅ Single state to manage which menu is open
+  const [activeMenu, setActiveMenu] = useState(null); 
 
   const wrapperRef = useRef(null);
-  const callMenuRef = useRef(null);
-  const waMenuRef = useRef(null);
-  const socialMenuRef = useRef(null);
-  const appMenuRef = useRef(null);
-  const enquiryMenuRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setIsOpen(false);
-        setShowCallMenu(false);
-        setShowWhatsappMenu(false);
-        setShowSocialMenu(false);
-        setShowAppMenu(false);
-        setShowEnquiryMenu(false);
-        return;
+        setActiveMenu(null); // Close any open menu when clicking outside
       }
-      if (callMenuRef.current && !callMenuRef.current.contains(e.target)) setShowCallMenu(false);
-      if (waMenuRef.current && !waMenuRef.current.contains(e.target)) setShowWhatsappMenu(false);
-      if (socialMenuRef.current && !socialMenuRef.current.contains(e.target)) setShowSocialMenu(false);
-      if (appMenuRef.current && !appMenuRef.current.contains(e.target)) setShowAppMenu(false);
-      if (enquiryMenuRef.current && !enquiryMenuRef.current.contains(e.target)) setShowEnquiryMenu(false);
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // ✅ Helper function to toggle menus
+  const toggleMenu = (menuName) => {
+    setActiveMenu((prev) => (prev === menuName ? null : menuName));
+  };
 
   const callNumbers = [
     { label: "Associate Support", number: "+917082013211" },
@@ -64,13 +50,13 @@ function FloatingContactButtons({ onEnquiryClick }) {
 
   const whatsappMessage = encodeURIComponent("Hello! I would like to know more about your courses.");
 
-  const handleCallNumber = (number) => { window.location.href = `tel:${number}`; setShowCallMenu(false); };
-  const handleWhatsappNumber = (number) => { window.open(`https://wa.me/${number}?text=${whatsappMessage}`, "_blank", "noopener,noreferrer"); setShowWhatsappMenu(false); };
-  const handleSocialClick = (url) => { window.open(url, "_blank", "noopener,noreferrer"); setShowSocialMenu(false); };
-  const handleAppClick = (url) => { window.open(url, "_blank", "noopener,noreferrer"); setShowAppMenu(false); };
+  const handleCallNumber = (number) => { window.location.href = `tel:${number}`; setActiveMenu(null); };
+  const handleWhatsappNumber = (number) => { window.open(`https://wa.me/${number}?text=${whatsappMessage}`, "_blank", "noopener,noreferrer"); setActiveMenu(null); };
+  const handleSocialClick = (url) => { window.open(url, "_blank", "noopener,noreferrer"); setActiveMenu(null); };
+  const handleAppClick = (url) => { window.open(url, "_blank", "noopener,noreferrer"); setActiveMenu(null); };
 
   // =====================================================
-  // ✅ ICONS (Added aria-hidden="true" to all SVGs)
+  // ✅ ICONS
   // =====================================================
   const WhatsAppIcon = () => (<svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>);
   const CallIcon = () => (<svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z"/></svg>);
@@ -80,6 +66,12 @@ function FloatingContactButtons({ onEnquiryClick }) {
   const EnquiryIcon = () => (
     <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
       <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"/>
+    </svg>
+  );
+
+  const ApplyIcon = () => (
+    <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
     </svg>
   );
 
@@ -142,18 +134,40 @@ function FloatingContactButtons({ onEnquiryClick }) {
         .fcb-enquiry-standalone { background: linear-gradient(135deg, #10b981, #059669); animation: fcbEnquiryPulse 2s infinite; }
         @keyframes fcbEnquiryPulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); } 70% { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
+        /* ✅ Standalone Apply Button */
+        .fcb-apply-standalone { background: linear-gradient(135deg, #ef4444, #b91c1c); animation: fcbApplyPulse 2s infinite; }
+        @keyframes fcbApplyPulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
         /* Tooltips */
         .fcb-tooltip { position: absolute; right: 70px; top: 50%; transform: translateY(-50%); background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; white-space: nowrap; opacity: 0; pointer-events: none; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
         .fcb-tooltip::after { content: ""; position: absolute; right: -5px; top: 50%; transform: translateY(-50%); border: 5px solid transparent; border-left-color: #1e293b; }
         .fcb-btn:hover .fcb-tooltip { opacity: 1; right: 68px; }
         
-        /* Popup Menus */
-        .fcb-menu { position: absolute; right: 70px; bottom: -40px; top: auto; background: #fff; border-radius: 14px; box-shadow: 0 12px 40px rgba(15, 23, 42, 0.22); padding: 12px; min-width: 280px; max-width: 320px; border: 1px solid #edf0f5; animation: fcbMenuIn 0.2s ease; z-index: 999999; max-height: calc(100vh - 180px); overflow-y: auto; }
+        /* =========================================
+           ✅ FIXED POPUP MENUS
+           ========================================= */
+        .fcb-menu { 
+            position: fixed; 
+            right: 90px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            background: #fff; 
+            border-radius: 14px; 
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.22); 
+            padding: 12px; 
+            min-width: 280px; 
+            max-width: 320px; 
+            border: 1px solid #edf0f5; 
+            animation: fcbMenuIn 0.2s ease; 
+            z-index: 999999; 
+            max-height: 80vh; 
+            overflow-y: auto; 
+        }
         
-        /* Enquiry popup position adjustment */
-        .fcb-enquiry-menu { bottom: 0; }
-
-        @keyframes fcbMenuIn { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fcbMenuIn { 
+            from { opacity: 0; transform: translateY(-40%) scale(0.95); } 
+            to { opacity: 1; transform: translateY(-50%) scale(1); } 
+        }
         
         .fcb-menu-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 6px 10px; display: flex; align-items: center; gap: 7px; }
         .fcb-menu-title i { font-size: 13px; }
@@ -197,7 +211,16 @@ function FloatingContactButtons({ onEnquiryClick }) {
           .fcb-tooltip { display: none; }
           .fcb-main-toggle::before { animation: none; }
           .fcb-enquiry-standalone { animation: none; }
-          .fcb-menu { right: 0; bottom: 65px; top: auto; min-width: 260px; max-width: 90vw; max-height: 70vh; }
+          .fcb-apply-standalone { animation: none; }
+          
+          .fcb-menu { 
+            right: 75px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            min-width: 240px; 
+            max-width: 80vw; 
+            max-height: 70vh; 
+          }
         }
       `}</style>
 
@@ -206,12 +229,12 @@ function FloatingContactButtons({ onEnquiryClick }) {
         {/* 1. EXPANDABLE MENU (Only Call, WA, Social, App) */}
         <div className={`fcb-sub-buttons ${isOpen ? "show" : ""}`}>
           
-          <div className="fcb-menu-wrap" ref={socialMenuRef}>
-            <button type="button" className="fcb-btn fcb-social" onClick={() => { setShowSocialMenu((prev) => !prev); setShowAppMenu(false); setShowCallMenu(false); setShowWhatsappMenu(false); setShowEnquiryMenu(false); }} aria-label="Follow us on social media" title="Follow Us">
+          <div className="fcb-menu-wrap">
+            <button type="button" className="fcb-btn fcb-social" onClick={() => toggleMenu('social')} aria-label="Follow us on social media" title="Follow Us">
               <SocialIcon />
               <span className="fcb-tooltip">Follow Us</span>
             </button>
-            {showSocialMenu && (
+            {activeMenu === 'social' && (
               <div className="fcb-menu">
                 <div className="fcb-menu-title social"><i className="bi bi-share-fill" aria-hidden="true"></i> Follow Us</div>
                 {socialLinks.map((item, index) => (
@@ -227,12 +250,12 @@ function FloatingContactButtons({ onEnquiryClick }) {
             )}
           </div>
 
-          <div className="fcb-menu-wrap" ref={appMenuRef}>
-            <button type="button" className="fcb-btn fcb-app" onClick={() => { setShowAppMenu((prev) => !prev); setShowSocialMenu(false); setShowCallMenu(false); setShowWhatsappMenu(false); setShowEnquiryMenu(false); }} aria-label="Download our mobile app" title="Download App">
+          <div className="fcb-menu-wrap">
+            <button type="button" className="fcb-btn fcb-app" onClick={() => toggleMenu('app')} aria-label="Download our mobile app" title="Download App">
               <AppIcon />
               <span className="fcb-tooltip">Download App</span>
             </button>
-            {showAppMenu && (
+            {activeMenu === 'app' && (
               <div className="fcb-menu">
                 <div className="fcb-menu-title app"><i className="bi bi-phone-fill" aria-hidden="true"></i> Download Our App</div>
                 {appLinks.map((item, index) => (
@@ -248,12 +271,12 @@ function FloatingContactButtons({ onEnquiryClick }) {
             )}
           </div>
 
-          <div className="fcb-menu-wrap" ref={waMenuRef}>
-            <button type="button" className="fcb-btn fcb-whatsapp" onClick={() => { setShowWhatsappMenu((prev) => !prev); setShowSocialMenu(false); setShowAppMenu(false); setShowCallMenu(false); setShowEnquiryMenu(false); }} aria-label="Chat with us on WhatsApp" title="Chat on WhatsApp">
+          <div className="fcb-menu-wrap">
+            <button type="button" className="fcb-btn fcb-whatsapp" onClick={() => toggleMenu('whatsapp')} aria-label="Chat with us on WhatsApp" title="Chat on WhatsApp">
               <WhatsAppIcon />
               <span className="fcb-tooltip">Chat on WhatsApp</span>
             </button>
-            {showWhatsappMenu && (
+            {activeMenu === 'whatsapp' && (
               <div className="fcb-menu">
                 <div className="fcb-menu-title wa"><i className="bi bi-whatsapp" aria-hidden="true"></i> WhatsApp Support</div>
                 {whatsappNumbers.map((item, index) => (
@@ -269,12 +292,12 @@ function FloatingContactButtons({ onEnquiryClick }) {
             )}
           </div>
 
-          <div className="fcb-menu-wrap" ref={callMenuRef}>
-            <button type="button" className="fcb-btn fcb-call" onClick={() => { setShowCallMenu((prev) => !prev); setShowSocialMenu(false); setShowAppMenu(false); setShowWhatsappMenu(false); setShowEnquiryMenu(false); }} aria-label="Call our support team" title="Call Us Now">
+          <div className="fcb-menu-wrap">
+            <button type="button" className="fcb-btn fcb-call" onClick={() => toggleMenu('call')} aria-label="Call our support team" title="Call Us Now">
               <CallIcon />
               <span className="fcb-tooltip">Call Us Now</span>
             </button>
-            {showCallMenu && (
+            {activeMenu === 'call' && (
               <div className="fcb-menu">
                 <div className="fcb-menu-title call"><i className="bi bi-headset" aria-hidden="true"></i> Contact Support</div>
                 {callNumbers.map((item, index) => (
@@ -291,20 +314,29 @@ function FloatingContactButtons({ onEnquiryClick }) {
           </div>
         </div>
 
-        {/* =======================================================
-            2. STANDALONE ENQUIRY BUTTON (Hamesha bahar dikhega)
-            ======================================================= */}
-        <div className="fcb-menu-wrap" ref={enquiryMenuRef}>
+        {/* 2. APPLY NOW BUTTON */}
+        <div className="fcb-menu-wrap">
+          <a
+            href="https://soft.shaheedbhagatsinghhealthandeducation.com/new-student-apply"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="fcb-btn fcb-apply-standalone"
+            aria-label="Apply Now"
+            title="Apply Now"
+          >
+            <ApplyIcon />
+            <span className="fcb-tooltip">Apply Now</span>
+          </a>
+        </div>
+
+        {/* 3. STANDALONE ENQUIRY BUTTON */}
+        <div className="fcb-menu-wrap">
           <button
             type="button"
             className="fcb-btn fcb-enquiry-standalone"
             onClick={() => {
-              setShowEnquiryMenu((prev) => !prev);
-              setIsOpen(false); 
-              setShowSocialMenu(false);
-              setShowAppMenu(false);
-              setShowCallMenu(false);
-              setShowWhatsappMenu(false);
+              toggleMenu('enquiry');
+              setIsOpen(false); // Close the + menu if it's open
             }}
             aria-label="Open enquiry form"
             title="Enquiry"
@@ -313,8 +345,8 @@ function FloatingContactButtons({ onEnquiryClick }) {
             <span className="fcb-tooltip">Enquiry Now</span>
           </button>
 
-          {showEnquiryMenu && (
-            <div className="fcb-menu fcb-enquiry-menu">
+          {activeMenu === 'enquiry' && (
+            <div className="fcb-menu">
               <div className="fcb-menu-title enquiry">
                 <i className="bi bi-question-circle-fill" aria-hidden="true"></i>
                 Select Enquiry Type
@@ -325,7 +357,7 @@ function FloatingContactButtons({ onEnquiryClick }) {
                 className="fcb-number-btn enquiry"
                 onClick={() => {
                   onEnquiryClick("student");
-                  setShowEnquiryMenu(false);
+                  setActiveMenu(null);
                 }}
                 aria-label="Student Enquiry"
               >
@@ -340,7 +372,7 @@ function FloatingContactButtons({ onEnquiryClick }) {
                 className="fcb-number-btn enquiry"
                 onClick={() => {
                   onEnquiryClick("franchise");
-                  setShowEnquiryMenu(false);
+                  setActiveMenu(null);
                 }}
                 aria-label="Franchise Enquiry"
               >
@@ -353,20 +385,13 @@ function FloatingContactButtons({ onEnquiryClick }) {
           )}
         </div>
 
-        {/* 3. MAIN TOGGLE BUTTON (+) */}
+        {/* 4. MAIN TOGGLE BUTTON (+) */}
         <button
           type="button"
           className={`fcb-main-toggle ${isOpen ? "open" : ""}`}
           onClick={() => {
             setIsOpen((prev) => !prev);
-            setShowEnquiryMenu(false); 
-            
-            if (isOpen) {
-              setShowCallMenu(false);
-              setShowWhatsappMenu(false);
-              setShowSocialMenu(false);
-              setShowAppMenu(false);
-            }
+            setActiveMenu(null); // Close any open menu when toggling +
           }}
           aria-label="Open contact options"
           title="Contact Options"

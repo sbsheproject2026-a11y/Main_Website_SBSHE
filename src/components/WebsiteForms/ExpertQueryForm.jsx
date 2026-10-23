@@ -298,7 +298,7 @@ const ExpertQuery = () => {
 
 
                                 {/* COURSE */}
-                                <div className="col-md-12">
+                                {/* <div className="col-md-12">
                                     <div className="premium-field">
 
                                         <label htmlFor="expertCourse">Interested Course</label>
@@ -317,7 +317,7 @@ const ExpertQuery = () => {
                                         </div>
 
                                     </div>
-                                </div>
+                                </div> */}
 
 
                                 {/* MESSAGE */}
